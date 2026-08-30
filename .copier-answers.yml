@@ -1,0 +1,23 @@
+# Changes here will be overwritten by Copier
+_commit: b582244
+_src_path: gh:pantherale0/python-library-template
+add_me_as_contributor: false
+comm_protocol: http
+copyright_year: '2026'
+documentation: true
+email: jordan@hrvy.uk
+full_name: Jordan Harvey
+github_username: pantherale0
+has_cli: false
+initial_commit: true
+open_source_license: Apache-2.0
+open_with_editor: false
+package_name: pysainsburys
+project_name: Sainsburys API
+project_short_description: A async integration API for Sainsburys
+project_slug: pysainsburys
+run_uv_sync: true
+setup_agent_skills: false
+setup_github: false
+setup_pre_commit: true
+
