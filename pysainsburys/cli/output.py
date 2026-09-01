@@ -189,6 +189,59 @@ def emit_order_status(status: Any, *, as_json: bool) -> None:
         print(f"Slot:       {status.slot_start_time} - {end}")
 
 
+def emit_slot_week(week: Any, *, as_json: bool) -> None:
+    """Print a slot week listing."""
+    if as_json:
+        emit_json(week.to_dict())
+        return
+    slot_type = week.slot_type.value if week.slot_type else "slot"
+    header = f"{slot_type.title()} slots"
+    if week.week_start_date:
+        header = f"{header} (week of {week.week_start_date})"
+    print(header)
+    if week.store_identifier:
+        print(f"Store:    {week.store_identifier}")
+    if week.postcode:
+        print(f"Postcode: {week.postcode}")
+    if not week.days:
+        print("  (no days returned)")
+        return
+    for day in week.days:
+        label = day.day_label or day.date or "Day"
+        print(f"  {label}")
+        if not day.slots:
+            print("    (no slots)")
+            continue
+        for slot in day.slots:
+            status = "available" if slot.is_available else "unavailable"
+            price = format_price(slot.price)
+            start = slot.start_time or "?"
+            end = slot.end_time or "?"
+            uid = slot.slot_uid or "-"
+            print(f"    {start} - {end}  {price}  [{status}]  {uid}")
+
+
+def emit_slot_reservation(reservation: Any, *, as_json: bool) -> None:
+    """Print the current slot reservation."""
+    if as_json:
+        emit_json(reservation.to_dict())
+        return
+    print(f"Type:   {reservation.reservation_type or '-'}")
+    if reservation.postcode:
+        print(f"Postcode: {reservation.postcode}")
+    if reservation.store_identifier:
+        print(f"Store:    {reservation.store_identifier}")
+    if reservation.is_expired:
+        print("Status:   expired")
+    elif reservation.slot:
+        start = reservation.slot.start_time or "?"
+        end = reservation.slot.end_time or "?"
+        print(f"Slot:     {start} - {end}")
+        print(f"Price:    {format_price(reservation.slot.price)}")
+    else:
+        print("Slot:     none reserved")
+
+
 def emit_product(product: Any, *, as_json: bool) -> None:
     """Print a single catalogue product."""
     if as_json:

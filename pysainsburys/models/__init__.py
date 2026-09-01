@@ -43,6 +43,13 @@ from .product import (
     parse_nutrition,
     parse_nutrition_from_details_html,
 )
+from .slot import (
+    DeliverySlot,
+    LocationContext,
+    SlotDay,
+    SlotReservation,
+    SlotWeek,
+)
 from .store import (
     FinderPage,
     Store,
@@ -57,7 +64,9 @@ __all__ = [
     "Basket",
     "BasketItem",
     "Customer",
+    "DeliverySlot",
     "FinderPage",
+    "LocationContext",
     "NectarOffer",
     "NectarOffers",
     "NectarSearchHit",
@@ -74,6 +83,9 @@ __all__ = [
     "Product",
     "ProductList",
     "ProductReviews",
+    "SlotDay",
+    "SlotReservation",
+    "SlotWeek",
     "Store",
     "StoreList",
     "StoreProduct",

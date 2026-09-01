@@ -29,6 +29,7 @@ class API:
         body: dict[str, Any] | list[Any] | None = None,
         *,
         params: dict[str, str | int | float | bool] | None = None,
+        headers: dict[str, str] | None = None,
         **path_params: str,
     ) -> dict[str, Any] | list[Any] | None:
         """Send a request to the API using the authentication handler."""
@@ -41,11 +42,18 @@ class API:
         )
         endpoint_map = GOL_ENDPOINTS[endpoint]
         built_url = GOL_BASE_URL + endpoint_map["endpoint"].format(**path_params)
+        endpoint_headers = endpoint_map.get("headers")
+        request_headers: dict[str, str] | None = None
+        if isinstance(endpoint_headers, dict):
+            request_headers = dict(endpoint_headers)
+        if headers:
+            request_headers = {**(request_headers or {}), **headers}
         return await self._auth.send_request(
             method=endpoint_map["method"],
             url=built_url,
             body=body,
             params=params,
+            headers=request_headers,
         )
 
     async def send_public_request(

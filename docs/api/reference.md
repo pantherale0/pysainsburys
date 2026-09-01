@@ -56,6 +56,12 @@
 
 ::: pysainsburys.orders.Orders
 
+### Slot
+
+::: pysainsburys.models.slot
+
+::: pysainsburys.slots.Slots
+
 ### Store
 
 ::: pysainsburys.models.store

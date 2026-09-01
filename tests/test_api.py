@@ -56,6 +56,22 @@ async def test_send_public_request(api: API, mock_auth: MagicMock) -> None:
 
 
 @pytest.mark.asyncio
+async def test_send_request_passes_endpoint_headers(
+    api: API, mock_auth: MagicMock
+) -> None:
+    """Endpoint-specific headers are forwarded to the auth layer."""
+    await api.send_request(
+        endpoint="list_slots",
+        body={"slot_type": "delivery"},
+    )
+    mock_auth.send_request.assert_awaited_once()
+    call_kwargs = mock_auth.send_request.await_args.kwargs
+    assert call_kwargs["headers"] == {"X-Http-Method-Override": "GET"}
+    assert call_kwargs["method"] == "POST"
+    assert call_kwargs["url"].endswith("/slot/v2/slots")
+
+
+@pytest.mark.asyncio
 async def test_send_request(api: API, mock_auth: MagicMock) -> None:
     """Test the send_request method."""
     response = await api.send_request(endpoint="customer_profile")

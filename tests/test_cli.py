@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pysainsburys.enum import SlotType
 from pysainsburys.cli import build_parser, default_session_path
 
 
@@ -125,3 +126,20 @@ def test_parser_store_search_command() -> None:
     assert args.store_command == "search"
     assert args.store_id == "2665"
     assert args.keyword == "milk"
+
+
+def test_parser_slots_list_delivery_command() -> None:
+    """Slots list command parses delivery options."""
+    args = build_parser().parse_args(
+        ["slots", "list", "--type", "delivery", "--postcode", "SW1A1AA"]
+    )
+    assert args.command == "slots"
+    assert args.slots_command == "list"
+    assert args.slot_type is SlotType.DELIVERY
+    assert args.postcode == "SW1A1AA"
+
+
+def test_parser_slots_reservation_command() -> None:
+    """Slots reservation command is parsed."""
+    args = build_parser().parse_args(["slots", "reservation"])
+    assert args.slots_command == "reservation"

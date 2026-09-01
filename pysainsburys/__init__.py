@@ -17,6 +17,7 @@ from .api import API
 from .auth import GOLAuth
 from .basket import BasketAccess
 from .config import COMM_PROTOCOL, Config
+from .enum import SlotType
 from .exceptions import (
     BrowserLoginRequiredError,
     MFARequiredError,
@@ -27,6 +28,8 @@ from .models import (
     Basket,
     BasketItem,
     Customer,
+    DeliverySlot,
+    LocationContext,
     NutrientSummary,
     NutritionInfo,
     NutritionTable,
@@ -36,6 +39,9 @@ from .models import (
     OrderSummary,
     Product,
     ProductList,
+    SlotDay,
+    SlotReservation,
+    SlotWeek,
     Store,
     StoreList,
     StoreProduct,
@@ -47,6 +53,7 @@ from .models import (
 )
 from .nectar import Nectar
 from .orders import OrderHandle, Orders
+from .slots import Slots, build_list_slots_payload
 from .utils import is_awaitable
 
 __all__ = [
@@ -58,8 +65,10 @@ __all__ = [
     "BrowserLoginRequiredError",
     "Config",
     "Customer",
+    "DeliverySlot",
     "Favourites",
     "GOLAuth",
+    "LocationContext",
     "MFARequiredError",
     "Nectar",
     "NotBoundError",
@@ -77,6 +86,11 @@ __all__ = [
     "Product",
     "ProductList",
     "Sainsburys",
+    "SlotDay",
+    "SlotReservation",
+    "SlotType",
+    "SlotWeek",
+    "Slots",
     "Store",
     "StoreList",
     "StoreProduct",
@@ -86,6 +100,7 @@ __all__ = [
     "bind_products",
     "bind_store",
     "bind_stores",
+    "build_list_slots_payload",
 ]
 
 _LOGGER = logging.getLogger(__name__)

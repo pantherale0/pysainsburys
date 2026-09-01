@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from ...favourites import Favourites
     from ...nectar import Nectar
     from ...orders import Orders
+    from ...slots import Slots
 
 
 @dataclass(slots=True)
@@ -22,8 +23,8 @@ class Customer:
     Authenticated Sainsbury's Groceries Online customer profile.
 
     A customer is returned by :meth:`~pysainsburys.Sainsburys.get_customer` and
-    exposes convenience accessors for basket, favourites, and order resources
-    when bound to a client.
+    exposes convenience accessors for basket, favourites, orders, and slot
+    resources when bound to a client.
 
     Attributes:
         user_id: Commerce platform user identifier.
@@ -70,6 +71,9 @@ class Customer:
         default=None, init=False, repr=False, compare=False, hash=False
     )
     _nectar: Nectar | None = field(
+        default=None, init=False, repr=False, compare=False, hash=False
+    )
+    _slots: Slots | None = field(
         default=None, init=False, repr=False, compare=False, hash=False
     )
 
@@ -138,6 +142,15 @@ class Customer:
         if self._nectar is None:
             self._nectar = Nectar(self._require_api())
         return self._nectar
+
+    @property
+    def slots(self) -> Slots:
+        """Delivery and collection slot listing helpers."""
+        from ...slots import Slots
+
+        if self._slots is None:
+            self._slots = Slots(self._require_api())
+        return self._slots
 
     @property
     def display_name(self) -> str:
