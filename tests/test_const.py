@@ -11,3 +11,13 @@ def test_basket_endpoint_matches_live_capture_path() -> None:
 
     add_url = GOL_BASE_URL + GOL_ENDPOINTS["add_basket_item"]["endpoint"]
     assert add_url.endswith("/groceries-api/gol-services/basket/v2/basket/item")
+
+
+def test_gol_endpoints_include_slot_listing() -> None:
+    """Slot listing endpoints are registered with method override headers."""
+    slots = GOL_ENDPOINTS["list_slots"]
+    assert slots["method"] == "POST"
+    assert slots["endpoint"].endswith("/slot/v2/slots")
+    assert slots["headers"] == {"X-Http-Method-Override": "GET"}
+    assert GOL_ENDPOINTS["get_slot_reservation"]["method"] == "GET"
+    assert GOL_ENDPOINTS["get_slot_location_context"]["method"] == "GET"

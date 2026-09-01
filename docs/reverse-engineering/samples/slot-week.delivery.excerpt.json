@@ -1,0 +1,47 @@
+{
+  "week_start_date": "2026-03-02T00:00:00Z",
+  "store_identifier": "0474",
+  "postcode": "SW1A1AA",
+  "days": [
+    {
+      "date": "2026-03-07",
+      "day_label": "Saturday 7 March",
+      "slots": [
+        {
+          "slot_uid": "slot-delivery-0630",
+          "start_time": "2026-03-07T06:30:00Z",
+          "end_time": "2026-03-07T07:30:00Z",
+          "price": 4.0,
+          "unqualified_price": 7.0,
+          "is_available": true,
+          "status": "AVAILABLE",
+          "slot_type": "delivery"
+        },
+        {
+          "slot_uid": "slot-delivery-0830",
+          "start_time": "2026-03-07T08:30:00Z",
+          "end_time": "2026-03-07T09:30:00Z",
+          "price": 2.5,
+          "is_available": false,
+          "status": "FULLY_BOOKED",
+          "slot_type": "delivery"
+        }
+      ]
+    },
+    {
+      "date": "2026-03-08",
+      "day_label": "Sunday 8 March",
+      "slots": [
+        {
+          "slot_uid": "slot-delivery-1000",
+          "start_time": "2026-03-08T10:00:00Z",
+          "end_time": "2026-03-08T11:00:00Z",
+          "price": 0.0,
+          "is_available": true,
+          "status": "AVAILABLE",
+          "slot_type": "delivery"
+        }
+      ]
+    }
+  ]
+}

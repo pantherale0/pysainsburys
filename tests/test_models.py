@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from pysainsburys.enum import SlotType
 from pysainsburys.models import (
     Basket,
     Customer,
@@ -10,6 +11,7 @@ from pysainsburys.models import (
     OrderStatus,
     Product,
     ProductList,
+    SlotWeek,
 )
 
 SAMPLES = Path(__file__).resolve().parents[1] / "docs/reverse-engineering/samples"
@@ -131,6 +133,17 @@ def test_order_status_from_dict() -> None:
     assert status.is_cutoff is True
     assert status.total == 42.5
     assert status.order_type == "delivery"
+
+
+def test_slot_week_from_sample() -> None:
+    """Slot weeks parse day groupings and availability flags."""
+    data = json.loads((SAMPLES / "slot-week.delivery.excerpt.json").read_text())
+    week = SlotWeek.from_dict(data, slot_type=SlotType.DELIVERY)
+    assert week.week_start_date == "2026-03-02T00:00:00Z"
+    assert len(week.days) == 2
+    assert len(week.slots) == 3
+    assert len(week.available_slots) == 2
+    assert week.available_slots[0].price == 4.0
 
 
 def test_product_to_dict_roundtrip() -> None:

@@ -139,4 +139,17 @@ GOL_ENDPOINTS: dict[str, dict[str, str]] = {
         "method": "PUT",
         "endpoint": f"{GOL_API_PREFIX}/nectar/v1/nectar/ynp-opt-ins",
     },
+    "list_slots": {
+        "method": "POST",
+        "endpoint": f"{GOL_API_PREFIX}/slot/v2/slots",
+        "headers": {"X-Http-Method-Override": "GET"},
+    },
+    "get_slot_reservation": {
+        "method": "GET",
+        "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation",
+    },
+    "get_slot_location_context": {
+        "method": "GET",
+        "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation/location-context",
+    },
 }

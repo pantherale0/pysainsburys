@@ -29,6 +29,13 @@ from .nectar import (
     YourNectarPrices,
 )
 from .order import OrderList, OrderStatus, OrderSummary
+from .slot import (
+    DeliverySlot,
+    LocationContext,
+    SlotDay,
+    SlotReservation,
+    SlotWeek,
+)
 from .product import (
     NutrientSummary,
     NutritionInfo,
@@ -57,7 +64,9 @@ __all__ = [
     "Basket",
     "BasketItem",
     "Customer",
+    "DeliverySlot",
     "FinderPage",
+    "LocationContext",
     "NectarOffer",
     "NectarOffers",
     "NectarSearchHit",
@@ -74,6 +83,9 @@ __all__ = [
     "Product",
     "ProductList",
     "ProductReviews",
+    "SlotDay",
+    "SlotReservation",
+    "SlotWeek",
     "Store",
     "StoreList",
     "StoreProduct",

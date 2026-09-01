@@ -76,6 +76,31 @@ CLI examples::
 
 Use ``basket show`` to read each line's ``line`` id before ``set`` or ``remove``.
 
+## Slots
+
+List delivery or click-and-collect availability through ``customer.slots``:
+
+```python
+customer = await client.get_customer()
+
+week = await customer.slots.list_delivery()
+for slot in week.available_slots:
+    print(slot.start_time, slot.price)
+
+collection = await customer.slots.list_collection(store_identifier="0474")
+reservation = await customer.slots.fetch_reservation()
+```
+
+CLI examples::
+
+    pysainsburys slots list --type delivery
+    pysainsburys slots list --type collection --store 0474
+    pysainsburys slots reservation
+
+The list call uses ``POST /slot/v2/slots`` with ``X-Http-Method-Override: GET``.
+Location context is fetched automatically unless ``--no-context`` is passed on
+the CLI or ``use_location_context=False`` in Python.
+
 ## Customer resources
 
 Authenticated helpers hang off :class:`~pysainsburys.models.customer.Customer`:
@@ -135,6 +160,7 @@ Command groups mirror the library modules:
 | `basket` | `show`, `add`, `set`, `remove`, `clear` |
 | `favourites` | `list`, `add`, `remove` |
 | `orders` | `list`, `show`, `status` |
+| `slots` | `list`, `reservation` |
 | `product` | `show`, `search` |
 | `store` | `near`, `postcode`, `show`, `search` |
 
@@ -144,6 +170,7 @@ python -m pysainsburys product search bread --page 2
 python -m pysainsburys product show 3236048 --json
 python -m pysainsburys basket add 3236048 --quantity 2
 python -m pysainsburys favourites add 3236048
+python -m pysainsburys slots list --type delivery
 python -m pysainsburys store search 2665 milk
 python -m pysainsburys auth refresh
 ```

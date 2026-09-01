@@ -17,6 +17,7 @@ pysainsburys.models
 ├── basket/          # Basket, BasketItem
 ├── customer/        # Customer profile
 ├── order/           # OrderSummary, OrderList, OrderStatus
+├── slot/            # DeliverySlot, SlotWeek, SlotReservation
 └── store/           # Store, StoreProduct, Product Finder pagination
 ```
 
@@ -69,7 +70,23 @@ Authenticated fetch/clear operations are provided by
 
 | Type | Purpose |
 | --- | --- |
-| :class:`~pysainsburys.models.customer.customer.Customer` | Signed-in profile with ``basket``, ``favourites``, and ``orders`` accessors |
+| :class:`~pysainsburys.models.customer.customer.Customer` | Signed-in profile with ``basket``, ``favourites``, ``orders``, and ``slots`` accessors |
+
+## Slot
+
+| Type | Purpose |
+| --- | --- |
+| :class:`~pysainsburys.models.slot.slot.DeliverySlot` | Single delivery or collection time window |
+| :class:`~pysainsburys.models.slot.slot.SlotDay` | Slots grouped for one calendar day |
+| :class:`~pysainsburys.models.slot.slot.SlotWeek` | Week view returned by the slot listing API |
+| :class:`~pysainsburys.models.slot.slot.SlotReservation` | Current reserved slot state |
+| :class:`~pysainsburys.models.slot.slot.LocationContext` | Location context for slot queries |
+
+Listing helpers live in :class:`~pysainsburys.slots.Slots` on ``customer.slots``.
+
+**Note:** The slot week list endpoint was mapped from static analysis but not
+live-captured in Phase 1. Some accounts or environments may block direct API
+access; see the reverse-engineering docs for limitations.
 
 ## Order
 

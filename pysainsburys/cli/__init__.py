@@ -8,6 +8,7 @@ Command groups mirror the library layout:
 * :mod:`pysainsburys.cli.basket` — basket operations
 * :mod:`pysainsburys.cli.favourites` — favourite products
 * :mod:`pysainsburys.cli.orders` — order history and status
+* :mod:`pysainsburys.cli.slots` — delivery and collection slots
 * :mod:`pysainsburys.cli.nectar` — Nectar offers and Your Nectar Prices
 * :mod:`pysainsburys.cli.product` — catalogue search and lookup
 * :mod:`pysainsburys.cli.store` — stores and in-store product search
@@ -29,7 +30,7 @@ from ..exceptions import (
     HttpException,
     SessionRequiredError,
 )
-from . import auth, basket, customer, favourites, nectar, orders, product, store
+from . import auth, basket, customer, favourites, nectar, orders, product, slots, store
 from .session import DEFAULT_SESSION_PATH, default_session_path
 
 CommandHandler = Callable[[argparse.Namespace], Awaitable[int]]
@@ -78,6 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
     basket.register(subparsers)
     favourites.register(subparsers)
     orders.register(subparsers)
+    slots.register(subparsers)
     nectar.register(subparsers)
     product.register(subparsers)
     store.register(subparsers)
