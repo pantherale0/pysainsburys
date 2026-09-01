@@ -42,9 +42,6 @@ results = await client.search_products("milk", page_number=1, page_size=24)
 # Detail with nutrition (public)
 product = await client.get_product("3236048")
 print(product.nutrition.summary if product.nutrition else "no nutrition data")
-
-# Barcode resolution via Open Food Facts (public)
-product = await client.lookup_barcode("8002270018213")
 ```
 
 ## Basket
@@ -138,8 +135,8 @@ Command groups mirror the library modules:
 | `basket` | `show`, `add`, `set`, `remove`, `clear` |
 | `favourites` | `list`, `add`, `remove` |
 | `orders` | `list`, `show`, `status` |
-| `product` | `show`, `search`, `barcode` |
-| `store` | `near`, `postcode`, `show`, `search`, `barcode` |
+| `product` | `show`, `search` |
+| `store` | `near`, `postcode`, `show`, `search` |
 
 ```bash
 python -m pysainsburys --help

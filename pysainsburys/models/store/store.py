@@ -58,8 +58,7 @@ class Store:
     A Sainsbury's store from Product Finder or click-and-collect.
 
     When bound to a :class:`~pysainsburys.Sainsburys` client, a store can
-    search in-store stock via :meth:`search_products` and resolve barcodes with
-    :meth:`lookup_barcode`.
+    search in-store stock via :meth:`search_products`.
 
     Attributes:
         name: Store display name.
@@ -193,23 +192,6 @@ class Store:
             msg = "Store product search response was not a JSON object."
             raise TypeError(msg)
         return StoreProductList.from_dict(response)
-
-    async def lookup_barcode(
-        self,
-        barcode: str,
-        *,
-        page_size: int = 24,
-    ) -> StoreProduct:
-        """Resolve a barcode to an in-store product via Open Food Facts."""
-        # Deferred: barcode imports models.store and would circularise at import time.
-        from ...barcode import lookup_store_barcode
-
-        return await lookup_store_barcode(
-            session=self._require_api()._auth.session,
-            barcode=barcode,
-            search_products=self.search_products,
-            page_size=page_size,
-        )
 
     def to_dict(self) -> dict[str, Any]:
         """Serialise the store to a plain dictionary."""

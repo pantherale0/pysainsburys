@@ -8,7 +8,6 @@ import pytest
 
 from pysainsburys import Sainsburys
 from pysainsburys.auth import GOLAuth
-from pysainsburys.barcode import OpenFoodFactsProduct
 from pysainsburys.models.store import Store, StoreList, StoreProduct
 
 
@@ -215,55 +214,6 @@ async def test_store_search_products(client: Sainsburys) -> None:
             "size": 20,
         },
     )
-
-
-@pytest.mark.asyncio
-async def test_store_lookup_barcode(client: Sainsburys) -> None:
-    """Stores resolve barcodes to in-store products."""
-    client.api.send_product_finder_request = AsyncMock(
-        side_effect=[
-            {
-                "id": "2665",
-                "name": "Nine Elms",
-                "address1": "62 Wandsworth Road",
-                "city": "London",
-                "postCode": "SW8 2LF",
-                "isAvailable": True,
-            },
-            {
-                "content": [
-                    {
-                        "productCode": "357937",
-                        "productName": (
-                            "San Pellegrino Sparkling Natural Mineral Water 1L"
-                        ),
-                        "retail": {"price": "1.25"},
-                        "stock": "IN_STOCK",
-                        "aisle": "12",
-                    }
-                ],
-                "page": {"size": 1, "number": 1, "totalElements": 1, "totalPages": 1},
-            },
-        ]
-    )
-
-    from unittest.mock import patch
-
-    with patch(
-        "pysainsburys.barcode.fetch_open_food_facts_product",
-        new=AsyncMock(
-            return_value=OpenFoodFactsProduct(
-                barcode="8002270018213",
-                product_name="San Pellegrino Sparkling Natural Mineral Water 1L",
-                brands="San Pellegrino",
-            )
-        ),
-    ):
-        store = await client.get_store("2665")
-        product = await store.lookup_barcode("8002270018213")
-
-    assert product.product_code == "357937"
-    assert product.aisle == "12"
 
 
 @pytest.mark.asyncio

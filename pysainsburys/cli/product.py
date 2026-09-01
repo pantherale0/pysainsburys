@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import argparse
-import sys
 
-from ..exceptions import BarcodeNotFoundError
 from ._args import add_pagination_options
-from .output import emit_json, emit_product, emit_product_list
+from .output import emit_product, emit_product_list
 from .session import with_public_client
 
 
@@ -41,23 +39,6 @@ async def cmd_search(args: argparse.Namespace) -> int:
     return 0
 
 
-async def cmd_barcode(args: argparse.Namespace) -> int:
-    """Look up a catalogue product by barcode."""
-    client = await with_public_client()
-    try:
-        product = await client.lookup_barcode(args.barcode)
-        emit_product(product, as_json=args.json)
-    except BarcodeNotFoundError as exc:
-        if args.json:
-            emit_json({"error": str(exc), "barcode": args.barcode})
-        else:
-            print(str(exc), file=sys.stderr)
-        return 1
-    finally:
-        await client.close()
-    return 0
-
-
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     """Register ``product`` commands."""
     parser = subparsers.add_parser("product", help="Catalogue product commands")
@@ -71,10 +52,3 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     search.add_argument("keyword", help="Search keyword")
     add_pagination_options(search)
     search.set_defaults(handler=cmd_search)
-
-    barcode = product_sub.add_parser(
-        "barcode",
-        help="Look up a product by barcode (via Open Food Facts)",
-    )
-    barcode.add_argument("barcode", help="Product barcode / EAN")
-    barcode.set_defaults(handler=cmd_barcode)

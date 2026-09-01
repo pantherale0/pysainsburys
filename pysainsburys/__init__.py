@@ -15,12 +15,10 @@ from typing import Any
 from ._version import __version__
 from .api import API
 from .auth import GOLAuth
-from .barcode import lookup_barcode as resolve_barcode
 from .basket import BasketAccess
 from .config import COMM_PROTOCOL, Config
 from .enum import AuthChannel
 from .exceptions import (
-    BarcodeNotFoundError,
     BrowserLoginRequiredError,
     MFARequiredError,
     NotBoundError,
@@ -56,7 +54,6 @@ __all__ = [
     "API",
     "COMM_PROTOCOL",
     "AuthChannel",
-    "BarcodeNotFoundError",
     "Basket",
     "BasketAccess",
     "BasketItem",
@@ -184,21 +181,6 @@ class Sainsburys:
         product_list = ProductList.from_dict(response)
         bind_products(self.api, product_list.products)
         return product_list
-
-    async def lookup_barcode(
-        self,
-        barcode: str,
-        *,
-        page_size: int = 24,
-    ) -> Product:
-        """Resolve a barcode to a Sainsbury's product via Open Food Facts."""
-        product = await resolve_barcode(
-            session=self.api._auth.session,
-            barcode=barcode,
-            search_products=self.search_products,
-            page_size=page_size,
-        )
-        return bind_product(self.api, product)
 
     async def find_stores(
         self,

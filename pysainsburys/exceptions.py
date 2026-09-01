@@ -176,21 +176,3 @@ class ParseError(Exception):
 
 class NotBoundError(Exception):
     """Domain object is not bound to an authenticated client."""
-
-
-class BarcodeNotFoundError(Exception):
-    """No Sainsbury's product matched the scanned barcode."""
-
-    def __init__(
-        self,
-        barcode: str,
-        *,
-        search_query: str | None = None,
-        message: str | None = None,
-    ) -> None:
-        self.barcode = barcode
-        self.search_query = search_query
-        detail = message or f"No product found for barcode {barcode}"
-        if search_query:
-            detail = f"{detail} (search query: {search_query!r})"
-        super().__init__(detail)

@@ -5,9 +5,6 @@ GOL_BASE_URL = "https://www.sainsburys.co.uk"
 GOL_API_PREFIX = "/groceries-api/gol-services"
 PRODUCT_FINDER_BASE_URL = "https://www.sainsburys.co.uk/product-finder"
 
-OPEN_FOOD_FACTS_BASE_URL = "https://world.openfoodfacts.org"
-OPEN_FOOD_FACTS_USER_AGENT = "pysainsburys/1.0"
-
 AUTH_BASE_URL = "https://account.sainsburys.co.uk"
 AUTH_BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "

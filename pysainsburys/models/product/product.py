@@ -6,7 +6,6 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ...basket import resolve_basket_item_uid
 from ...exceptions import NotBoundError
 from ..basket.basket import Basket, basket_from_response
 from ..common.pagination import PageControls
@@ -145,8 +144,7 @@ class Product:
         if self._api is None:
             msg = (
                 "Product is not bound to a Sainsburys client; "
-                "fetch it via Sainsburys.get_product(), search_products(), "
-                "or lookup_barcode()."
+                "fetch it via Sainsburys.get_product() or search_products()."
             )
             raise NotBoundError(msg)
         return self._api
@@ -182,6 +180,16 @@ class Product:
         response = await api.send_request(endpoint="add_basket_item", body=body)
         return basket_from_response(response)
 
+    async def _resolve_basket_item_uid(self, item_uid: str | None) -> str:
+        """Resolve a basket line uid without importing basket at module load."""
+        from ...basket import resolve_basket_item_uid
+
+        return await resolve_basket_item_uid(
+            self._require_api(),
+            self.product_uid,
+            item_uid,
+        )
+
     async def set_basket_quantity(
         self,
         quantity: float,
@@ -194,11 +202,7 @@ class Product:
         if quantity <= 0:
             return await self.remove_from_basket(item_uid=item_uid)
         api = self._require_api()
-        resolved_item_uid = await resolve_basket_item_uid(
-            api,
-            self.product_uid,
-            item_uid,
-        )
+        resolved_item_uid = await self._resolve_basket_item_uid(item_uid)
         item: dict[str, Any] = {
             "product_uid": self.product_uid,
             "quantity": quantity,
@@ -221,13 +225,8 @@ class Product:
     ) -> Basket:
         """Remove this product from the basket."""
         del force_delete
-        api = self._require_api()
-        resolved_item_uid = await resolve_basket_item_uid(
-            api,
-            self.product_uid,
-            item_uid,
-        )
-        response = await api.send_request(
+        resolved_item_uid = await self._resolve_basket_item_uid(item_uid)
+        response = await self._require_api().send_request(
             endpoint="update_basket",
             body={
                 "items": [

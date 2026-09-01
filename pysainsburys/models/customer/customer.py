@@ -6,14 +6,14 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ...basket import BasketAccess
 from ...exceptions import NotBoundError
-from ...favourites import Favourites
-from ...nectar import Nectar
-from ...orders import Orders
 
 if TYPE_CHECKING:
     from ...api import API
+    from ...basket import BasketAccess
+    from ...favourites import Favourites
+    from ...nectar import Nectar
+    from ...orders import Orders
 
 
 @dataclass(slots=True)
@@ -106,6 +106,8 @@ class Customer:
     @property
     def favourites(self) -> Favourites:
         """Favourites list and add/remove helpers for this customer."""
+        from ...favourites import Favourites
+
         if self._favourites is None:
             self._favourites = Favourites(self._require_api())
         return self._favourites
@@ -113,6 +115,8 @@ class Customer:
     @property
     def basket(self) -> BasketAccess:
         """Basket fetch and clear helpers for this customer."""
+        from ...basket import BasketAccess
+
         if self._basket_access is None:
             self._basket_access = BasketAccess(self._require_api())
         return self._basket_access
@@ -120,6 +124,8 @@ class Customer:
     @property
     def orders(self) -> Orders:
         """Order history, latest order, and per-order status."""
+        from ...orders import Orders
+
         if self._orders is None:
             self._orders = Orders(self._require_api())
         return self._orders
@@ -127,6 +133,8 @@ class Customer:
     @property
     def nectar(self) -> Nectar:
         """Nectar bonus offers and Your Nectar Price helpers."""
+        from ...nectar import Nectar
+
         if self._nectar is None:
             self._nectar = Nectar(self._require_api())
         return self._nectar

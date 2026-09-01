@@ -126,13 +126,6 @@ def test_parser_product_search_command() -> None:
     assert args.page == 2
 
 
-def test_parser_product_barcode_command() -> None:
-    """Product barcode command parses the EAN argument."""
-    args = build_parser().parse_args(["product", "barcode", "8002270018213"])
-    assert args.product_command == "barcode"
-    assert args.barcode == "8002270018213"
-
-
 def test_parser_store_near_command() -> None:
     """Store near command parses coordinates."""
     args = build_parser().parse_args(
@@ -150,11 +143,3 @@ def test_parser_store_search_command() -> None:
     assert args.store_command == "search"
     assert args.store_id == "2665"
     assert args.keyword == "milk"
-
-
-def test_parser_store_barcode_command() -> None:
-    """Store barcode command parses store id and EAN."""
-    args = build_parser().parse_args(["store", "barcode", "2665", "8002270018213"])
-    assert args.store_command == "barcode"
-    assert args.store_id == "2665"
-    assert args.barcode == "8002270018213"
