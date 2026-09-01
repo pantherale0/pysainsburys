@@ -23,7 +23,6 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from .._version import __version__
-from ..enum import AuthChannel
 from ..exceptions import (
     AuthError,
     BrowserLoginRequiredError,
@@ -31,7 +30,6 @@ from ..exceptions import (
     SessionRequiredError,
 )
 from . import auth, basket, customer, favourites, nectar, orders, product, store
-from ._args import parse_channel
 from .session import DEFAULT_SESSION_PATH, default_session_path
 
 CommandHandler = Callable[[argparse.Namespace], Awaitable[int]]
@@ -40,7 +38,6 @@ __all__ = [
     "build_parser",
     "default_session_path",
     "main",
-    "parse_channel",
     "run_command",
 ]
 
@@ -72,12 +69,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--verbose",
         action="store_true",
         help="Enable debug logging",
-    )
-    parser.add_argument(
-        "--channel",
-        type=parse_channel,
-        default=AuthChannel.WEB,
-        help="OAuth client channel for auth commands (web or android)",
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)

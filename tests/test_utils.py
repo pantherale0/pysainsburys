@@ -23,7 +23,7 @@ def test_build_code_challenge_is_urlsafe() -> None:
 def test_decode_oauth_redirect_from_query() -> None:
     """Authorization codes are parsed from query redirects."""
     code, state = decode_oauth_redirect(
-        "sainsburys://oauth/redirect-login?code=abc123&state=xyz"
+        "https://www.sainsburys.co.uk/gol-ui/oauth/redirect?code=abc123&state=xyz"
     )
     assert code == "abc123"
     assert state == "xyz"

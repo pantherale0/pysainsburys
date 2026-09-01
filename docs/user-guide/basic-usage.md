@@ -24,7 +24,7 @@ For public endpoints (search, product detail, store lookup), an empty
 | Method | When to use |
 | --- | --- |
 | ``GOLAuth.from_session_file(path)`` | Reuse a session saved by the CLI or a previous login |
-| ``auth.login(email, password)`` | Credential login (web channel, MFA supported) |
+| ``auth.login(email, password)`` | Credential login (MFA supported) |
 | ``auth.send_login_request()`` + ``auth.finish_login(redirect)`` | Browser-based OAuth with PKCE |
 
 After login, persist the session for reuse:

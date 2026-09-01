@@ -14,27 +14,23 @@ import aiohttp
 from yarl import URL
 
 from .const import (
-    AUTH_ANDROID_CLIENT_ID,
-    AUTH_ANDROID_EXTRA_PARAMS,
-    AUTH_ANDROID_REDIRECT_URI,
     AUTH_AUTHORIZE_URL,
     AUTH_BASE_URL,
+    AUTH_CLIENT_ID,
     AUTH_CODE_CHALLENGE_METHOD,
     AUTH_DISCOVERY_URL,
+    AUTH_EXTRA_PARAMS,
     AUTH_LOGIN_URL,
     AUTH_MFA_URL,
+    AUTH_REDIRECT_URI,
     AUTH_SCOPE,
     AUTH_SEND_MFA_URL,
     AUTH_TOKEN_URL,
-    AUTH_WEB_CLIENT_ID,
-    AUTH_WEB_EXTRA_PARAMS,
-    AUTH_WEB_REDIRECT_URI,
     BROWSER_HEADERS,
     GOL_APP_USER_AGENT,
     GOL_BASE_URL,
     GOL_ENDPOINTS,
 )
-from .enum import AuthChannel
 from .exceptions import (
     AccessDeniedError,
     AuthError,
@@ -99,7 +95,6 @@ class GOLAuth:
         cookies: dict[str, str] | None = None,
         app_version: str | None = None,
         login_hint: str | None = None,
-        channel: AuthChannel = AuthChannel.WEB,
         session: aiohttp.ClientSession | None = None,
     ) -> None:
         self._auth_session = session
@@ -113,7 +108,6 @@ class GOLAuth:
         default_version = GOL_APP_USER_AGENT.removeprefix("GOLAppAndroid/")
         self.app_version = app_version or default_version
         self.login_hint = login_hint
-        self.channel = channel
         self.next_refresh: datetime | None = None
         self.personalization_id: str | None = None
         self.oidc_config: dict[str, Any] | None = None
@@ -142,27 +136,6 @@ class GOLAuth:
                 )
         return self._auth_session
 
-    @property
-    def oauth_client_id(self) -> str:
-        """Return the OAuth client id for the configured channel."""
-        if self.channel is AuthChannel.WEB:
-            return AUTH_WEB_CLIENT_ID
-        return AUTH_ANDROID_CLIENT_ID
-
-    @property
-    def oauth_redirect_uri(self) -> str:
-        """Return the OAuth redirect URI for the configured channel."""
-        if self.channel is AuthChannel.WEB:
-            return AUTH_WEB_REDIRECT_URI
-        return AUTH_ANDROID_REDIRECT_URI
-
-    @property
-    def oauth_extra_params(self) -> dict[str, str]:
-        """Return extra OAuth authorize parameters for the configured channel."""
-        if self.channel is AuthChannel.WEB:
-            return dict(AUTH_WEB_EXTRA_PARAMS)
-        return dict(AUTH_ANDROID_EXTRA_PARAMS)
-
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> GOLAuth:
         """Create an auth object from a serialized session mapping."""
@@ -175,13 +148,6 @@ class GOLAuth:
             msg = "Session cookies must be a mapping or Cookie header string."
             raise ValueError(msg)
 
-        channel_value = data.get("channel", AuthChannel.WEB.value)
-        channel = (
-            channel_value
-            if isinstance(channel_value, AuthChannel)
-            else AuthChannel(str(channel_value))
-        )
-
         auth = cls(
             access_token=data.get("access_token"),
             refresh_token=data.get("refresh_token"),
@@ -191,7 +157,6 @@ class GOLAuth:
             cookies={str(k): str(v) for k, v in cookies.items()},
             app_version=data.get("app_version"),
             login_hint=data.get("login_hint"),
-            channel=channel,
         )
         return cls._apply_session_metadata(auth, data)
 
@@ -279,7 +244,6 @@ class GOLAuth:
             "cookies": self.cookies,
             "app_version": self.app_version,
             "login_hint": self.login_hint,
-            "channel": self.channel.value,
             "personalization_id": self.personalization_id,
             "next_refresh": (
                 self.next_refresh.isoformat() if self.next_refresh is not None else None
@@ -454,15 +418,13 @@ class GOLAuth:
         raise AuthError("Too many identity redirects.")
 
     def _authorization_code_from_url(self, url: str) -> str | None:
-        """Return an authorization code when the URL matches this channel."""
+        """Return an authorization code when the URL matches the OAuth redirect."""
         code, _state = decode_oauth_redirect(url)
         if code is None:
             return None
         parsed = urllib.parse.urlparse(url)
-        redirect = urllib.parse.urlparse(self.oauth_redirect_uri)
+        redirect = urllib.parse.urlparse(AUTH_REDIRECT_URI)
         if parsed.netloc == redirect.netloc and parsed.path == redirect.path:
-            return code
-        if self.channel is AuthChannel.ANDROID and parsed.scheme == "sainsburys":
             return code
         return None
 
@@ -534,14 +496,14 @@ class GOLAuth:
         code_challenge = build_code_challenge(self._pkce_verifier)
         self._oauth_state = secrets.token_urlsafe(32)
         params: dict[str, str] = {
-            "client_id": self.oauth_client_id,
+            "client_id": AUTH_CLIENT_ID,
             "response_type": "code",
-            "redirect_uri": self.oauth_redirect_uri,
+            "redirect_uri": AUTH_REDIRECT_URI,
             "scope": AUTH_SCOPE,
             "code_challenge": code_challenge,
             "code_challenge_method": AUTH_CODE_CHALLENGE_METHOD,
             "state": self._oauth_state,
-            **self.oauth_extra_params,
+            **AUTH_EXTRA_PARAMS,
         }
         if self.login_hint:
             params["login_hint"] = self.login_hint
@@ -568,8 +530,8 @@ class GOLAuth:
             data=urllib.parse.urlencode(
                 {
                     "grant_type": "authorization_code",
-                    "client_id": self.oauth_client_id,
-                    "redirect_uri": self.oauth_redirect_uri,
+                    "client_id": AUTH_CLIENT_ID,
+                    "redirect_uri": AUTH_REDIRECT_URI,
                     "code": code,
                     "code_verifier": self._pkce_verifier,
                 }
@@ -630,10 +592,6 @@ class GOLAuth:
         io_black_box: str | None = None,
     ) -> None:
         """Submit username and password to the web identity login form."""
-        if self.channel is not AuthChannel.WEB:
-            msg = "Credential login is only supported for the web OAuth channel."
-            raise AuthError(msg)
-
         login_challenge = await self._ensure_login_challenge()
 
         referer = self._login_referer or (
@@ -674,10 +632,6 @@ class GOLAuth:
 
     async def request_mfa_code(self) -> None:
         """Request delivery of an MFA verification code."""
-        if self.channel is not AuthChannel.WEB:
-            msg = "MFA delivery is only supported for the web OAuth channel."
-            raise AuthError(msg)
-
         referer = self._login_referer or AUTH_MFA_URL
         headers = self._browser_headers(referer=referer)
         headers["Accept"] = "*/*"
@@ -706,10 +660,6 @@ class GOLAuth:
         exchange_commerce: bool = True,
     ) -> dict[str, Any]:
         """Submit an MFA verification code and complete OAuth token exchange."""
-        if self.channel is not AuthChannel.WEB:
-            msg = "MFA login is only supported for the web OAuth channel."
-            raise AuthError(msg)
-
         referer = self._login_referer or AUTH_MFA_URL
         form: dict[str, str] = {"code": code}
         if io_black_box is not None:
@@ -744,9 +694,6 @@ class GOLAuth:
     ) -> dict[str, Any] | None:
         """Sign in via web credentials or start interactive browser login."""
         if username is not None and password is not None:
-            if self.channel is not AuthChannel.WEB:
-                msg = "Credential login is only supported for the web OAuth channel."
-                raise AuthError(msg)
             await self.send_login_request()
             try:
                 await self.send_credentials(
@@ -796,7 +743,7 @@ class GOLAuth:
                 data=urllib.parse.urlencode(
                     {
                         "grant_type": "refresh_token",
-                        "client_id": self.oauth_client_id,
+                        "client_id": AUTH_CLIENT_ID,
                         "refresh_token": self.refresh_token,
                     }
                 ),

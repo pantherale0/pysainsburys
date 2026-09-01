@@ -8,8 +8,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from pysainsburys.auth import GOLAuth
-from pysainsburys.const import AUTH_SCOPE, AUTH_WEB_CLIENT_ID
-from pysainsburys.enum import AuthChannel
+from pysainsburys.const import AUTH_CLIENT_ID, AUTH_SCOPE
 from pysainsburys.exceptions import (
     BrowserLoginRequiredError,
     ConfirmationRedirectError,
@@ -169,14 +168,15 @@ async def test_fetch_oidc_configuration() -> None:
 
 def test_build_authorization_url_contains_pkce_params() -> None:
     """Authorization URLs include PKCE and web OAuth parameters."""
-    auth = GOLAuth(login_hint="user@example.com", channel=AuthChannel.WEB)
+    auth = GOLAuth(login_hint="user@example.com")
     auth.oidc_config = {
         "authorization_endpoint": "https://account.sainsburys.co.uk/oauth2/auth",
     }
     url = auth.build_authorization_url()
     assert "code_challenge=" in url
     assert "code_challenge_method=S256" in url
-    assert f"client_id={AUTH_WEB_CLIENT_ID}" in url
+    assert f"client_id={AUTH_CLIENT_ID}" in url
+    assert "client_id=gol-android" not in url
     assert (
         "redirect_uri=https%3A%2F%2Fwww.sainsburys.co.uk%2Fgol-ui%2Foauth%2Fredirect"
         in url
@@ -189,15 +189,17 @@ def test_build_authorization_url_contains_pkce_params() -> None:
     assert auth._oauth_state is not None
 
 
-def test_build_authorization_url_android_channel() -> None:
-    """Android channel uses the app OAuth client and redirect URI."""
-    auth = GOLAuth(channel=AuthChannel.ANDROID)
-    auth.oidc_config = {
-        "authorization_endpoint": "https://account.sainsburys.co.uk/oauth2/auth",
-    }
-    url = auth.build_authorization_url()
-    assert "client_id=gol-android" in url
-    assert "channel=Android" in url
+def test_from_dict_ignores_legacy_channel() -> None:
+    """Session files that stored an OAuth channel still load."""
+    auth = GOLAuth.from_dict(
+        {
+            "access_token": "oauth-token",
+            "cookies": {},
+            "channel": "android",
+        }
+    )
+    assert auth.access_token == "oauth-token"
+    assert "channel" not in auth.to_dict()
 
 
 @pytest.mark.asyncio
@@ -228,7 +230,7 @@ async def test_finish_login_requires_pkce_state() -> None:
 @pytest.mark.asyncio
 async def test_request_mfa_code_posts_to_send_mfa_endpoint() -> None:
     """MFA delivery is triggered via the send-mfa endpoint."""
-    auth = GOLAuth(channel=AuthChannel.WEB)
+    auth = GOLAuth()
     auth._login_referer = "https://account.sainsburys.co.uk/gol/login/mfa"
 
     mock_response = AsyncMock()
@@ -272,7 +274,6 @@ async def test_send_refresh_request_raises_when_refresh_token_rejected() -> None
         access_token="expired-token",
         refresh_token="stale-refresh",
         cookies={},
-        channel=AuthChannel.WEB,
     )
     auth.next_refresh = datetime.now(UTC) - timedelta(hours=1)
 
@@ -302,7 +303,6 @@ async def test_send_request_raises_when_refresh_token_rejected() -> None:
         refresh_token="stale-refresh",
         wc_auth_token="682092082%2Ctrusted",
         cookies={},
-        channel=AuthChannel.WEB,
     )
     auth.next_refresh = datetime.now(UTC) - timedelta(hours=1)
 
@@ -324,7 +324,6 @@ async def test_send_request_raises_when_refresh_token_rejected() -> None:
 def test_pending_login_roundtrip() -> None:
     """In-progress login state can be serialized and restored."""
     auth = GOLAuth(
-        channel=AuthChannel.WEB,
         cookies={"session": "abc"},
     )
     auth._pkce_verifier = "verifier"

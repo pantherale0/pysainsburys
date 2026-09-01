@@ -47,7 +47,7 @@ Save a session file after browser or credential login:
 python -m pysainsburys auth login
 # or complete browser login:
 python -m pysainsburys auth url
-python -m pysainsburys auth finish 'sainsburys://...'
+python -m pysainsburys auth finish 'https://www.sainsburys.co.uk/gol-ui/oauth/redirect?code=...'
 ```
 
 Then use the saved session in Python:

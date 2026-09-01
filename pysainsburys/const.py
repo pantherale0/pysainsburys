@@ -13,31 +13,14 @@ AUTH_BROWSER_USER_AGENT = (
 )
 AUTH_DISCOVERY_URL = f"{AUTH_BASE_URL}/.well-known/openid-configuration"
 
-# Android app OAuth (AppAuth / PKCE)
-AUTH_ANDROID_CLIENT_ID = "gol-android"
-AUTH_ANDROID_REDIRECT_URI = "sainsburys://oauth/redirect-login"
-AUTH_ANDROID_LOGOUT_REDIRECT_URI = "sainsburys://oauth/redirect-logout"
-AUTH_ANDROID_EXTRA_PARAMS = {
-    "missionId": "gol",
-    "audience": "gol.sainsburys.co.uk",
-    "channel": "Android",
-    "appVersion": GOL_APP_USER_AGENT.removeprefix("GOLAppAndroid/"),
-}
-
-# Desktop web OAuth (gol-ui)
-AUTH_WEB_CLIENT_ID = "gol"
-AUTH_WEB_REDIRECT_URI = f"{GOL_BASE_URL}/gol-ui/oauth/redirect"
-AUTH_WEB_EXTRA_PARAMS = {
+# Desktop web OAuth (gol-ui). The grocery API is shared with the Android app.
+AUTH_CLIENT_ID = "gol"
+AUTH_REDIRECT_URI = f"{GOL_BASE_URL}/gol-ui/oauth/redirect"
+AUTH_EXTRA_PARAMS = {
     "missionId": "gol",
     "audience": "gol.sainsburys.co.uk",
     "response_mode": "query",
 }
-
-# Backwards-compatible aliases (android)
-AUTH_CLIENT_ID = AUTH_ANDROID_CLIENT_ID
-AUTH_REDIRECT_URI = AUTH_ANDROID_REDIRECT_URI
-AUTH_LOGOUT_REDIRECT_URI = AUTH_ANDROID_LOGOUT_REDIRECT_URI
-AUTH_EXTRA_PARAMS = AUTH_ANDROID_EXTRA_PARAMS
 
 AUTH_LOGIN_URL = f"{AUTH_BASE_URL}/gol/login"
 AUTH_MFA_URL = f"{AUTH_BASE_URL}/gol/login/mfa"

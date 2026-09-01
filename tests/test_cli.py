@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-import argparse
-
-import pytest
-
-from pysainsburys.cli import build_parser, default_session_path, parse_channel
-from pysainsburys.enum import AuthChannel
+from pysainsburys.cli import build_parser, default_session_path
 
 
 def test_default_session_path() -> None:
@@ -17,24 +12,11 @@ def test_default_session_path() -> None:
     assert path.parent.name == "pysainsburys"
 
 
-def test_parse_channel() -> None:
-    """Auth channel values map to enum members."""
-    assert parse_channel("web") is AuthChannel.WEB
-    assert parse_channel("android") is AuthChannel.ANDROID
-
-
-def test_parse_channel_rejects_unknown() -> None:
-    """Unknown auth channel values raise an argparse error."""
-    with pytest.raises(argparse.ArgumentTypeError):
-        parse_channel("ios")
-
-
 def test_parser_auth_url_command() -> None:
     """Auth URL command is parsed with defaults."""
     args = build_parser().parse_args(["auth", "url"])
     assert args.command == "auth"
     assert args.auth_command == "url"
-    assert args.channel is AuthChannel.WEB
     assert args.json is False
 
 

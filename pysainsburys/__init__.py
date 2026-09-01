@@ -17,7 +17,6 @@ from .api import API
 from .auth import GOLAuth
 from .basket import BasketAccess
 from .config import COMM_PROTOCOL, Config
-from .enum import AuthChannel
 from .exceptions import (
     BrowserLoginRequiredError,
     MFARequiredError,
@@ -53,7 +52,6 @@ from .utils import is_awaitable
 __all__ = [
     "API",
     "COMM_PROTOCOL",
-    "AuthChannel",
     "Basket",
     "BasketAccess",
     "BasketItem",

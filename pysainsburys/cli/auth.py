@@ -23,7 +23,7 @@ def pending_login_path(session_path: Path) -> Path:
 
 async def cmd_url(args: argparse.Namespace) -> int:
     """Print a browser authorization URL."""
-    auth = GOLAuth(channel=args.channel)
+    auth = GOLAuth()
     try:
         url = await auth.send_login_request()
     finally:
@@ -38,7 +38,7 @@ async def cmd_url(args: argparse.Namespace) -> int:
 async def cmd_finish(args: argparse.Namespace) -> int:
     """Complete browser login and persist the session."""
     session_path = Path(args.session)
-    auth = GOLAuth(channel=args.channel)
+    auth = GOLAuth()
     try:
         await auth.finish_login(args.redirect)
         ensure_session_parent(session_path)
@@ -107,7 +107,7 @@ async def cmd_login(args: argparse.Namespace) -> int:
     if password is None:
         password = getpass.getpass("Password: ")
 
-    auth = GOLAuth(channel=args.channel)
+    auth = GOLAuth()
     try:
         try:
             await auth.login(username, password, exchange_commerce=True)
