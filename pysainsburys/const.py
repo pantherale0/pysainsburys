@@ -1,5 +1,7 @@
 """Sainsbury's GOL API constants."""
 
+from typing import TypedDict
+
 GOL_APP_USER_AGENT = "GOLAppAndroid/3.65.0"
 GOL_BASE_URL = "https://www.sainsburys.co.uk"
 GOL_API_PREFIX = "/groceries-api/gol-services"
@@ -50,7 +52,16 @@ BROWSER_HEADERS: dict[str, str] = {
     "upgrade-insecure-requests": "1",
 }
 
-GOL_ENDPOINTS: dict[str, dict[str, str]] = {
+
+class EndpointSpec(TypedDict, total=False):
+    """HTTP method, path, and optional extra headers for a grocery endpoint."""
+
+    method: str
+    endpoint: str
+    headers: dict[str, str]
+
+
+GOL_ENDPOINTS: dict[str, EndpointSpec] = {
     "login_access_token": {
         "method": "POST",
         "endpoint": f"{GOL_API_PREFIX}/login/v1/login-access-token",

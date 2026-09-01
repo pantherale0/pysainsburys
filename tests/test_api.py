@@ -56,7 +56,9 @@ async def test_send_public_request(api: API, mock_auth: MagicMock) -> None:
 
 
 @pytest.mark.asyncio
-async def test_send_request_passes_endpoint_headers(api: API, mock_auth: MagicMock) -> None:
+async def test_send_request_passes_endpoint_headers(
+    api: API, mock_auth: MagicMock
+) -> None:
     """Endpoint-specific headers are forwarded to the auth layer."""
     await api.send_request(
         endpoint="list_slots",

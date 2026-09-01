@@ -146,6 +146,8 @@ class Customer:
     @property
     def slots(self) -> Slots:
         """Delivery and collection slot listing helpers."""
+        from ...slots import Slots
+
         if self._slots is None:
             self._slots = Slots(self._require_api())
         return self._slots

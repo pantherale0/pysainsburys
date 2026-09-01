@@ -71,9 +71,13 @@ class Slots:
         """Return the last fetched slot reservation, if any."""
         return self._reservation_cache
 
-    async def fetch_reservation(self, *, order_uid: str | None = None) -> SlotReservation:
+    async def fetch_reservation(
+        self, *, order_uid: str | None = None
+    ) -> SlotReservation:
         """Fetch the customer's current slot reservation state."""
-        params = {"order_uid": order_uid} if order_uid else None
+        params: dict[str, str | int | float | bool] | None = (
+            {"order_uid": order_uid} if order_uid else None
+        )
         response = await self._api.send_request(
             endpoint="get_slot_reservation",
             params=params,

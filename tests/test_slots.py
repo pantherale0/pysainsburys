@@ -138,7 +138,9 @@ async def test_fetch_reservation(client: Sainsburys) -> None:
     assert reservation.reservation_type == "delivery"
     assert reservation.slot is not None
     assert reservation.slot.price == 4.0
-    client.api.send_request.assert_awaited_with(endpoint="get_slot_reservation", params=None)
+    client.api.send_request.assert_awaited_with(
+        endpoint="get_slot_reservation", params=None
+    )
 
 
 @pytest.mark.asyncio

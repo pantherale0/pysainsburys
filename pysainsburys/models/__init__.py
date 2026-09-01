@@ -29,13 +29,6 @@ from .nectar import (
     YourNectarPrices,
 )
 from .order import OrderList, OrderStatus, OrderSummary
-from .slot import (
-    DeliverySlot,
-    LocationContext,
-    SlotDay,
-    SlotReservation,
-    SlotWeek,
-)
 from .product import (
     NutrientSummary,
     NutritionInfo,
@@ -49,6 +42,13 @@ from .product import (
     decode_details_html,
     parse_nutrition,
     parse_nutrition_from_details_html,
+)
+from .slot import (
+    DeliverySlot,
+    LocationContext,
+    SlotDay,
+    SlotReservation,
+    SlotWeek,
 )
 from .store import (
     FinderPage,

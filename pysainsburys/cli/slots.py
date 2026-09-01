@@ -52,7 +52,9 @@ async def cmd_reservation(args: argparse.Namespace) -> int:
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     """Register ``slots`` commands."""
-    parser = subparsers.add_parser("slots", help="Delivery and collection slot commands")
+    parser = subparsers.add_parser(
+        "slots", help="Delivery and collection slot commands"
+    )
     slots_sub = parser.add_subparsers(dest="slots_command", required=True)
 
     list_cmd = slots_sub.add_parser("list", help="List available slots")

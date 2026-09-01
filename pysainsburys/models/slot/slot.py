@@ -12,6 +12,8 @@ from ...enum import SlotType
 def _optional_float(value: object) -> float | None:
     if value is None:
         return None
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        return None
     try:
         return float(value)
     except (TypeError, ValueError):
@@ -108,8 +110,14 @@ class SlotDay:
         raw_slots = data.get("slots") or data.get("available_slots") or []
         return cls(
             date=data.get("date") or data.get("day_date"),
-            day_label=data.get("day_label") or data.get("label") or data.get("day_name"),
-            slots=[DeliverySlot.from_dict(item) for item in raw_slots if isinstance(item, dict)],
+            day_label=data.get("day_label")
+            or data.get("label")
+            or data.get("day_name"),
+            slots=[
+                DeliverySlot.from_dict(item)
+                for item in raw_slots
+                if isinstance(item, dict)
+            ],
         )
 
     @property
@@ -231,9 +239,7 @@ class SlotReservation:
         """Parse slot reservation JSON."""
         slot_data = data.get("slot")
         slot = (
-            DeliverySlot.from_dict(slot_data)
-            if isinstance(slot_data, dict)
-            else None
+            DeliverySlot.from_dict(slot_data) if isinstance(slot_data, dict) else None
         )
         flexi = data.get("flexi_stores") or []
         return cls(
