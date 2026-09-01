@@ -37,6 +37,7 @@ nav:
       - Quick Start: getting-started/quick-start.md
   - User Guide:
       - Basic Usage: user-guide/basic-usage.md
+      - Models: user-guide/models.md
   - API Reference:
       - Overview: api/reference.md
 

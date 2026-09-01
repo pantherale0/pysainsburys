@@ -1,0 +1,16 @@
+{
+  "killSwitchEnabled": false,
+  "minSupportedVersion": "2.48.0",
+  "minSupportedData": {
+    "title": "Update required",
+    "message": "The Sainsbury's Groceries app has been updated. The version you are using is no longer supported. Please update to continue using this app.",
+    "url": "https://play.google.com/store/apps/details?id=com.sainsburys.gol",
+    "buttonText": "Update"
+  },
+  "warningMessage": {
+    "title": null,
+    "message": "We're currently experiencing some technical challenges with our online product range, our team are working hard to rectify this as soon as possible.",
+    "url": "http://www.sainsburys.co.uk/shop/gb/groceries",
+    "buttonText": "Continue"
+  }
+}

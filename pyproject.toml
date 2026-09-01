@@ -30,10 +30,16 @@ classifiers = [
 ]
 dependencies = [
   "aiohttp>=3.9",
+  "ruff>=0.16.5",
 ]
-urls."Bug Tracker" = "https://github.com/pantherale0/pysainsburys/issues"
-urls.documentation = "https://pantherale0.github.io/pysainsburys"
-urls.repository = "https://github.com/pantherale0/pysainsburys"
+
+[project.scripts]
+pysainsburys = "pysainsburys.cli:main"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/pantherale0/pysainsburys/issues"
+documentation = "https://pantherale0.github.io/pysainsburys"
+repository = "https://github.com/pantherale0/pysainsburys"
 
 [tool.setuptools.packages.find]
 where = [ "." ]
@@ -76,7 +82,6 @@ lint.ignore = [
   "D401", # First line of docstring should be in imperative mood
 ]
 lint.per-file-ignores."conftest.py" = [ "D100" ]
-lint.per-file-ignores."pysainsburys/adapter.py" = [ "D102" ]
 lint.per-file-ignores."tests/**/*" = [
   "D100",
   "D101",
@@ -84,6 +89,8 @@ lint.per-file-ignores."tests/**/*" = [
   "D103",
   "D104",
   "S101",
+  "S105",
+  "S106",
 ]
 lint.isort.known-first-party = [ "pysainsburys", "tests" ]
 

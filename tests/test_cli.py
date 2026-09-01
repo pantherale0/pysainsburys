@@ -1,0 +1,160 @@
+"""Tests for the command-line interface."""
+
+from __future__ import annotations
+
+import argparse
+
+import pytest
+
+from pysainsburys.cli import build_parser, default_session_path, parse_channel
+from pysainsburys.enum import AuthChannel
+
+
+def test_default_session_path() -> None:
+    """The default session path lives under the user config directory."""
+    path = default_session_path()
+    assert path.name == "session.json"
+    assert path.parent.name == "pysainsburys"
+
+
+def test_parse_channel() -> None:
+    """Auth channel values map to enum members."""
+    assert parse_channel("web") is AuthChannel.WEB
+    assert parse_channel("android") is AuthChannel.ANDROID
+
+
+def test_parse_channel_rejects_unknown() -> None:
+    """Unknown auth channel values raise an argparse error."""
+    with pytest.raises(argparse.ArgumentTypeError):
+        parse_channel("ios")
+
+
+def test_parser_auth_url_command() -> None:
+    """Auth URL command is parsed with defaults."""
+    args = build_parser().parse_args(["auth", "url"])
+    assert args.command == "auth"
+    assert args.auth_command == "url"
+    assert args.channel is AuthChannel.WEB
+    assert args.json is False
+
+
+def test_parser_auth_login_command() -> None:
+    """Credential login flags are parsed."""
+    args = build_parser().parse_args(
+        [
+            "auth",
+            "login",
+            "-u",
+            "user@example.com",
+            "-p",
+            "secret",
+            "-m",
+            "123456",
+        ]
+    )
+    assert args.auth_command == "login"
+    assert args.username == "user@example.com"
+    assert args.password == "secret"
+    assert args.mfa_code == "123456"
+
+
+def test_parser_customer_show_command() -> None:
+    """Customer show command is parsed."""
+    args = build_parser().parse_args(["customer", "show"])
+    assert args.command == "customer"
+    assert args.customer_command == "show"
+
+
+def test_parser_basket_add_command() -> None:
+    """Basket add command parses product uid and quantity."""
+    args = build_parser().parse_args(["basket", "add", "12345", "--quantity", "2.5"])
+    assert args.command == "basket"
+    assert args.basket_command == "add"
+    assert args.product_uid == "12345"
+    assert args.quantity == 2.5
+
+
+def test_parser_basket_set_command() -> None:
+    """Basket set command parses target quantity."""
+    args = build_parser().parse_args(["basket", "set", "12345", "3"])
+    assert args.basket_command == "set"
+    assert args.quantity == 3.0
+
+
+def test_parser_basket_clear_command() -> None:
+    """Basket clear command is parsed."""
+    args = build_parser().parse_args(["basket", "clear"])
+    assert args.basket_command == "clear"
+
+
+def test_parser_favourites_add_command() -> None:
+    """Favourites add command parses the product uid."""
+    args = build_parser().parse_args(["favourites", "add", "6731637"])
+    assert args.favourites_command == "add"
+    assert args.product_uid == "6731637"
+
+
+def test_parser_orders_show_command() -> None:
+    """Orders show command parses the order id."""
+    args = build_parser().parse_args(["orders", "show", "order-1"])
+    assert args.orders_command == "show"
+    assert args.order_id == "order-1"
+
+
+def test_parser_orders_status_command() -> None:
+    """Orders status command accepts an optional order id."""
+    args = build_parser().parse_args(["orders", "status"])
+    assert args.orders_command == "status"
+    assert args.order_id is None
+
+
+def test_parser_product_show_command() -> None:
+    """Product show command parses the product uid."""
+    args = build_parser().parse_args(["product", "show", "abc-123"])
+    assert args.command == "product"
+    assert args.product_command == "show"
+    assert args.product_uid == "abc-123"
+
+
+def test_parser_product_search_command() -> None:
+    """Product search command parses keyword and pagination."""
+    args = build_parser().parse_args(
+        ["product", "search", "semi skimmed milk", "--page", "2"]
+    )
+    assert args.product_command == "search"
+    assert args.keyword == "semi skimmed milk"
+    assert args.page == 2
+
+
+def test_parser_product_barcode_command() -> None:
+    """Product barcode command parses the EAN argument."""
+    args = build_parser().parse_args(["product", "barcode", "8002270018213"])
+    assert args.product_command == "barcode"
+    assert args.barcode == "8002270018213"
+
+
+def test_parser_store_near_command() -> None:
+    """Store near command parses coordinates."""
+    args = build_parser().parse_args(
+        ["store", "near", "--lat", "51.5", "--lon", "-0.12"]
+    )
+    assert args.command == "store"
+    assert args.store_command == "near"
+    assert args.lat == 51.5
+    assert args.lon == -0.12
+
+
+def test_parser_store_search_command() -> None:
+    """Store search command parses store id and keyword."""
+    args = build_parser().parse_args(["store", "search", "2665", "milk"])
+    assert args.store_command == "search"
+    assert args.store_id == "2665"
+    assert args.keyword == "milk"
+
+
+def test_parser_store_barcode_command() -> None:
+    """Store barcode command parses store id and EAN."""
+    args = build_parser().parse_args(["store", "barcode", "2665", "8002270018213"])
+    assert args.store_command == "barcode"
+    assert args.store_id == "2665"
+    assert args.barcode == "8002270018213"

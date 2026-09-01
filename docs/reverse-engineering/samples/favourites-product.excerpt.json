@@ -1,0 +1,31 @@
+{
+  "products": [
+    {
+      "sainId": "4e8pysxv",
+      "product_uid": "6731637",
+      "is_favourite": true,
+      "favourite_type": "FREQUENTLY_BOUGHT",
+      "name": "San Pellegrino Sparkling Natural Mineral Water 1L",
+      "product_type": "BASIC",
+      "eans": ["8002270018213"],
+      "unit_price": { "price": 1.25, "measure": "ltr", "measure_amount": 1 },
+      "retail_price": { "price": 1.25, "measure": "ea" },
+      "is_available": true,
+      "is_alcoholic": false,
+      "reviews": {
+        "is_enabled": true,
+        "product_uid": "6731637",
+        "total": 108,
+        "average_rating": 4.2963
+      },
+      "assets": {
+        "plp_image": "https://assets.sainsburys-groceries.co.uk/gol/6731637/image.jpg"
+      }
+    }
+  ],
+  "controls": {
+    "total_record_count": 15,
+    "returned_record_count": 15,
+    "page": { "active": 1, "first": 1, "last": 2, "size": 15 }
+  }
+}
