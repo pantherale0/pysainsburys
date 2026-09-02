@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pysainsburys.enum import SlotType
 from pysainsburys.cli import build_parser, default_session_path
+from pysainsburys.enum import SlotType
 
 
 def test_default_session_path() -> None:

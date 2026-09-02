@@ -1,9 +1,9 @@
 """Enumerations for Sainsbury's GOL API."""
 
-from enum import Enum
+from enum import StrEnum
 
 
-class SlotType(str, Enum):
+class SlotType(StrEnum):
     """Delivery or click-and-collect slot listing type."""
 
     DELIVERY = "delivery"
