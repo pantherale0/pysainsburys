@@ -3,6 +3,9 @@
 from pysainsburys.utils import (
     build_code_challenge,
     decode_oauth_redirect,
+    identity_error_code,
+    is_identity_login_url,
+    is_identity_mfa_url,
     login_challenge_from_url,
     normalize_wc_auth_token,
     parse_authorization_input,
@@ -51,6 +54,21 @@ def test_resolve_redirect_url() -> None:
         resolve_redirect_url("/gol/login/mfa")
         == "https://account.sainsburys.co.uk/gol/login/mfa"
     )
+
+
+def test_identity_login_and_mfa_urls_ignore_query_and_ui_prefix() -> None:
+    """Login-ui paths with query strings are still recognised."""
+    login = (
+        "https://account.sainsburys.co.uk/login-ui/gol/login"
+        "?login_challenge=abc&error_code=6053"
+    )
+    mfa = "https://account.sainsburys.co.uk/login-ui/gol/login/mfa?login_challenge=abc"
+    assert is_identity_login_url(login) is True
+    assert is_identity_mfa_url(login) is False
+    assert identity_error_code(login) == "6053"
+    assert is_identity_mfa_url(mfa) is True
+    assert is_identity_login_url(mfa) is False
+    assert is_identity_mfa_url("https://account.sainsburys.co.uk/gol/login/mfa")
 
 
 def test_normalize_wc_auth_token_from_api_response() -> None:

@@ -46,11 +46,21 @@ def test_build_list_slots_payload_normalises_postcode() -> None:
         week_start_date="2026-03-02",
     )
     assert payload == {
-        "slot_type": "delivery",
+        "slot_type": "DELIVERY",
         "store_identifier": "0474",
         "postcode": "SW1A1AA",
         "week_start_date": "2026-03-02",
     }
+
+
+def test_build_list_slots_payload_maps_collection_type() -> None:
+    """Collection listings send the API CLICK_AND_COLLECT slot type."""
+    payload = build_list_slots_payload(
+        slot_type=SlotType.COLLECTION,
+        store_identifier="0474",
+        location_uid="loc-123",
+    )
+    assert payload["slot_type"] == "CLICK_AND_COLLECT"
 
 
 @pytest.mark.asyncio
@@ -79,7 +89,7 @@ async def test_list_delivery_slots_uses_location_context(client: Sainsburys) -> 
     list_call = client.api.send_request.await_args_list[-1]
     assert list_call.kwargs["endpoint"] == "list_slots"
     body = list_call.kwargs["body"]
-    assert body["slot_type"] == "delivery"
+    assert body["slot_type"] == "DELIVERY"
     assert body["postcode"] == "SW1A1AA"
     assert body["store_identifier"] == "0474"
     assert "week_start_date" in body
@@ -108,7 +118,7 @@ async def test_list_collection_slots_skips_context_when_disabled(
     assert week.slot_type is SlotType.COLLECTION
     list_call = client.api.send_request.await_args_list[-1]
     body = list_call.kwargs["body"]
-    assert body["slot_type"] == "collection"
+    assert body["slot_type"] == "CLICK_AND_COLLECT"
     assert body["location_uid"] == "loc-123"
 
 
@@ -164,4 +174,4 @@ async def test_slots_access_directly(mock_auth: MagicMock) -> None:
     assert call.kwargs["method"] == "POST"
     assert call.kwargs["url"].endswith("/slot/v2/slots")
     assert call.kwargs["headers"] == {"X-Http-Method-Override": "GET"}
-    assert call.kwargs["body"]["slot_type"] == "delivery"
+    assert call.kwargs["body"]["slot_type"] == "DELIVERY"

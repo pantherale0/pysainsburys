@@ -26,12 +26,13 @@ def build_list_slots_payload(
     """
     Build the conservative ``SlotPayload`` body for slot week listing.
 
-    Field names follow static analysis of the GOL Android app (v3.65.0). The
-    live slot list endpoint was not captured in Phase 1; callers may need to
+    Field names follow static analysis of the GOL Android app (v3.65.0).
+    ``slot_type`` is sent as ``DELIVERY`` or ``CLICK_AND_COLLECT``. The live
+    slot list endpoint was not captured in Phase 1; callers may need to
     supply ``store_identifier`` and ``postcode`` (delivery) or
     ``location_uid`` (collection) explicitly when location-context is empty.
     """
-    payload: dict[str, Any] = {"slot_type": slot_type.value}
+    payload: dict[str, Any] = {"slot_type": slot_type.api_value}
     if store_identifier is not None:
         payload["store_identifier"] = store_identifier
     if postcode is not None:

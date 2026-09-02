@@ -8,10 +8,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from pysainsburys.auth import GOLAuth
-from pysainsburys.const import AUTH_CLIENT_ID, AUTH_SCOPE
+from pysainsburys.const import AUTH_BASE_URL, AUTH_CLIENT_ID, AUTH_SCOPE
 from pysainsburys.exceptions import (
+    AuthError,
     BrowserLoginRequiredError,
     ConfirmationRedirectError,
+    MFARequiredError,
     SessionRequiredError,
 )
 from pysainsburys.utils import (
@@ -248,6 +250,66 @@ async def test_request_mfa_code_posts_to_send_mfa_endpoint() -> None:
     headers = mock_post.call_args.kwargs["headers"]
     assert headers["Content-Type"] == "application/json"
     assert headers["x-forwarded-from"] == "gol"
+    await auth.close()
+
+
+@pytest.mark.asyncio
+async def test_identity_post_sends_form_origin_headers() -> None:
+    """Credential POSTs include Origin and form content-type headers."""
+    auth = GOLAuth()
+    mock_response = AsyncMock()
+    mock_response.status = 302
+    mock_response.headers = {"Location": "/gol/login/mfa"}
+    mock_response.text = AsyncMock(return_value="")
+    mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+    mock_response.__aexit__ = AsyncMock(return_value=None)
+
+    with patch.object(auth.session, "request", return_value=mock_response) as mock_req:
+        await auth._identity_request(
+            "POST",
+            f"{AUTH_BASE_URL}/gol/login",
+            data={"username": "user@example.com", "password": "secret"},
+            referer=f"{AUTH_BASE_URL}/login-ui/gol/login",
+        )
+
+    headers = mock_req.call_args.kwargs["headers"]
+    assert headers["Origin"] == AUTH_BASE_URL
+    assert headers["Content-Type"] == "application/x-www-form-urlencoded"
+    await auth.close()
+
+
+@pytest.mark.asyncio
+async def test_send_credentials_detects_mfa_login_ui_query_string() -> None:
+    """MFA redirects from login-ui include a challenge query string."""
+    auth = GOLAuth()
+    auth._login_challenge = "abc123"
+    auth._login_referer = f"{AUTH_BASE_URL}/login-ui/gol/login?login_challenge=abc123"
+    auth.request_mfa_code = AsyncMock()
+    mfa_url = f"{AUTH_BASE_URL}/login-ui/gol/login/mfa?login_challenge=abc123"
+    auth._identity_request = AsyncMock(return_value=(302, "", mfa_url))
+
+    with pytest.raises(MFARequiredError):
+        await auth.send_credentials("user@example.com", "password")
+
+    auth.request_mfa_code.assert_awaited_once()
+    assert auth._login_referer == mfa_url
+    await auth.close()
+
+
+@pytest.mark.asyncio
+async def test_send_credentials_raises_identity_error_code() -> None:
+    """Identity error_code redirects are reported instead of an OAuth timeout."""
+    auth = GOLAuth()
+    auth._login_challenge = "abc123"
+    auth._login_referer = f"{AUTH_BASE_URL}/login-ui/gol/login?login_challenge=abc123"
+    error_url = (
+        f"{AUTH_BASE_URL}/login-ui/gol/login?login_challenge=abc123&error_code=6053"
+    )
+    auth._identity_request = AsyncMock(return_value=(302, "", error_url))
+
+    with pytest.raises(AuthError, match="error_code=6053"):
+        await auth.send_credentials("user@example.com", "password")
+    await auth.close()
 
 
 def test_oauth_access_token_expired() -> None:

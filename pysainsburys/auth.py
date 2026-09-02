@@ -53,6 +53,9 @@ from .utils import (
     build_code_challenge,
     cookies_to_header,
     decode_oauth_redirect,
+    identity_error_code,
+    is_identity_login_url,
+    is_identity_mfa_url,
     load_session_file,
     login_challenge_from_url,
     normalize_wc_auth_token,
@@ -379,7 +382,10 @@ class GOLAuth:
         referer: str | None = None,
     ) -> tuple[int, str, str | None]:
         """Send an identity request without auto-following redirects."""
-        headers = self._browser_headers(referer=referer)
+        if data is not None:
+            headers = self._form_post_headers(referer=referer or url)
+        else:
+            headers = self._browser_headers(referer=referer)
         async with self.session.request(
             method=method,
             url=url,
@@ -428,6 +434,26 @@ class GOLAuth:
             return code
         return None
 
+    def _raise_if_identity_error(self, url: str) -> None:
+        """Raise when an identity redirect indicates a failed login."""
+        error_code = identity_error_code(url)
+        if error_code is not None:
+            raise AuthError(f"Identity login failed (error_code={error_code}): {url}")
+        if is_identity_login_url(url):
+            raise AuthError(f"Login was not accepted: {url}")
+
+    async def _raise_mfa_required(self, url: str) -> None:
+        """Request an MFA code for *url* and raise ``MFARequiredError``."""
+        self._login_referer = url
+        challenge = login_challenge_from_url(url)
+        if challenge is not None:
+            self._login_challenge = challenge
+        await self.request_mfa_code()
+        raise MFARequiredError(
+            "Multi-factor authentication required. A verification code has "
+            "been sent; call send_mfa_request() with the code."
+        )
+
     async def _follow_until_authorization_code(
         self,
         start_url: str,
@@ -447,6 +473,10 @@ class GOLAuth:
             code = self._authorization_code_from_url(url)
             if code is not None:
                 return code
+
+            self._raise_if_identity_error(url)
+            if is_identity_mfa_url(url):
+                await self._raise_mfa_required(url)
 
             status, _text, location = await self._identity_request(
                 "GET",
@@ -615,17 +645,8 @@ class GOLAuth:
         if status not in {301, 302, 303, 307, 308} or not location:
             raise AuthError(f"Login failed ({status}).")
 
-        next_url = resolve_redirect_url(location)
-        if next_url.rstrip("/").endswith("/gol/login/mfa"):
-            self._login_referer = next_url
-            await self.request_mfa_code()
-            raise MFARequiredError(
-                "Multi-factor authentication required. A verification code has "
-                "been sent; call send_mfa_request() with the code."
-            )
-
         code = await self._follow_until_authorization_code(
-            next_url,
+            resolve_redirect_url(location),
             referer=AUTH_LOGIN_URL,
         )
         await self.exchange_authorization_code(code)

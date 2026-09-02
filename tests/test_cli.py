@@ -137,6 +137,14 @@ def test_parser_slots_list_delivery_command() -> None:
     assert args.slots_command == "list"
     assert args.slot_type is SlotType.DELIVERY
     assert args.postcode == "SW1A1AA"
+    assert args.slot_type.api_value == "DELIVERY"
+
+
+def test_parser_slots_list_collection_aliases() -> None:
+    """Collection CLI aliases map to the click-and-collect API slot type."""
+    args = build_parser().parse_args(["slots", "list", "--type", "click-and-collect"])
+    assert args.slot_type is SlotType.COLLECTION
+    assert args.slot_type.api_value == "CLICK_AND_COLLECT"
 
 
 def test_parser_slots_reservation_command() -> None:

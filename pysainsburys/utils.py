@@ -144,3 +144,24 @@ def resolve_redirect_url(location: str, *, base_url: str = AUTH_BASE_URL) -> str
 def login_challenge_from_url(url: str) -> str | None:
     """Extract a Hydra ``login_challenge`` query parameter."""
     return parse_query_param(url, "login_challenge")
+
+
+def identity_url_path(url: str) -> str:
+    """Return the path of an identity URL without a trailing slash."""
+    return urllib.parse.urlparse(url).path.rstrip("/")
+
+
+def is_identity_mfa_url(url: str) -> bool:
+    """Return whether *url* is the identity MFA page, ignoring query strings."""
+    return identity_url_path(url).endswith("/gol/login/mfa")
+
+
+def is_identity_login_url(url: str) -> bool:
+    """Return whether *url* is the identity login page, ignoring query strings."""
+    path = identity_url_path(url)
+    return path.endswith("/gol/login") and not path.endswith("/gol/login/mfa")
+
+
+def identity_error_code(url: str) -> str | None:
+    """Return an identity ``error_code`` query parameter when present."""
+    return parse_query_param(url, "error_code")
