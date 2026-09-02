@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import base64
 import hashlib
 import json
@@ -10,6 +9,8 @@ import secrets
 import urllib.parse
 from collections.abc import Callable
 from typing import Any
+
+import aiofiles
 
 from .const import AUTH_BASE_URL
 
@@ -65,31 +66,22 @@ def is_awaitable(value: object) -> bool:
     return callable(getattr(value, "__await__", None))
 
 
-def _read_session_file(path: str) -> dict[str, Any]:
-    """Load a session export JSON file from disk."""
-    with open(path, encoding="utf-8") as handle:
-        data = json.load(handle)
+async def load_session_file(path: str) -> dict[str, Any]:
+    """Load a session export JSON file."""
+    async with aiofiles.open(path, encoding="utf-8") as handle:
+        raw = await handle.read()
+    data = json.loads(raw)
     if not isinstance(data, dict):
         msg = "Session file must contain a JSON object."
         raise ValueError(msg)
     return data
 
 
-def _write_session_file(path: str, data: dict[str, Any]) -> None:
-    """Write a session export JSON file to disk."""
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=2, sort_keys=True)
-        handle.write("\n")
-
-
-async def load_session_file(path: str) -> dict[str, Any]:
-    """Load a session export JSON file without blocking the event loop."""
-    return await asyncio.to_thread(_read_session_file, path)
-
-
 async def save_session_file(path: str, data: dict[str, Any]) -> None:
-    """Write a session export JSON file without blocking the event loop."""
-    await asyncio.to_thread(_write_session_file, path, data)
+    """Write a session export JSON file."""
+    payload = json.dumps(data, indent=2, sort_keys=True) + "\n"
+    async with aiofiles.open(path, "w", encoding="utf-8") as handle:
+        await handle.write(payload)
 
 
 def call_or_await(callback: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
