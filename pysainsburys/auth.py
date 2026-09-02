@@ -178,9 +178,9 @@ class GOLAuth:
         return auth
 
     @classmethod
-    def from_session_file(cls, path: str) -> GOLAuth:
+    async def from_session_file(cls, path: str) -> GOLAuth:
         """Load a session export created by tooling or a previous ``to_dict()``."""
-        return cls.from_dict(load_session_file(path))
+        return cls.from_dict(await load_session_file(path))
 
     @property
     def refresh_token(self) -> str | None:
@@ -253,10 +253,10 @@ class GOLAuth:
             ),
         }
 
-    def save_session_file(self, path: str) -> None:
+    async def save_session_file(self, path: str) -> None:
         """Persist the current session to disk."""
         self._sync_session_cookies()
-        save_session_file(path, self.to_dict())
+        await save_session_file(path, self.to_dict())
 
     def pending_login_to_dict(self) -> dict[str, Any]:
         """Return in-progress login state for MFA completion."""
@@ -289,14 +289,14 @@ class GOLAuth:
         auth._login_challenge = pending["login_challenge"]
         return auth
 
-    def save_pending_login(self, path: str) -> None:
+    async def save_pending_login(self, path: str) -> None:
         """Persist in-progress login state awaiting MFA verification."""
-        save_session_file(path, self.pending_login_to_dict())
+        await save_session_file(path, self.pending_login_to_dict())
 
     @classmethod
-    def from_pending_login_file(cls, path: str) -> GOLAuth:
+    async def from_pending_login_file(cls, path: str) -> GOLAuth:
         """Load in-progress login state from disk."""
-        return cls.from_pending_login_dict(load_session_file(path))
+        return cls.from_pending_login_dict(await load_session_file(path))
 
     def _sync_session_cookies(self) -> None:
         """Copy cookies from the aiohttp jar into the session mapping."""

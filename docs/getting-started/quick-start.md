@@ -55,7 +55,7 @@ Then use the saved session in Python:
 ```python
 from pysainsburys import GOLAuth, Sainsburys
 
-auth = GOLAuth.from_session_file("~/.config/pysainsburys/session.json")
+auth = await GOLAuth.from_session_file("~/.config/pysainsburys/session.json")
 async with Sainsburys(auth) as client:
     customer = await client.get_customer()
     print(customer.display_name)

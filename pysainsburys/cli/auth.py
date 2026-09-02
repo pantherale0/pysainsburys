@@ -42,7 +42,7 @@ async def cmd_finish(args: argparse.Namespace) -> int:
     try:
         await auth.finish_login(args.redirect)
         ensure_session_parent(session_path)
-        auth.save_session_file(str(session_path))
+        await auth.save_session_file(str(session_path))
     finally:
         await auth.close()
     if args.json:
@@ -68,7 +68,7 @@ async def complete_mfa_login(
     else:
         pending_path = pending_login_path(session_path)
         ensure_session_parent(pending_path)
-        auth.save_pending_login(str(pending_path))
+        await auth.save_pending_login(str(pending_path))
         if args.json:
             emit_json(
                 {
@@ -86,7 +86,7 @@ async def complete_mfa_login(
 
     await auth.send_mfa_request(mfa_code, exchange_commerce=True)
     ensure_session_parent(session_path)
-    auth.save_session_file(str(session_path))
+    await auth.save_session_file(str(session_path))
     pending_path = pending_login_path(session_path)
     if pending_path.is_file():
         pending_path.unlink()
@@ -114,7 +114,7 @@ async def cmd_login(args: argparse.Namespace) -> int:
         except MFARequiredError:
             return await complete_mfa_login(auth, args, session_path=session_path)
         ensure_session_parent(session_path)
-        auth.save_session_file(str(session_path))
+        await auth.save_session_file(str(session_path))
     finally:
         await auth.close()
 
@@ -139,11 +139,11 @@ async def cmd_mfa(args: argparse.Namespace) -> int:
         )
         raise SessionRequiredError(msg)
 
-    auth = GOLAuth.from_pending_login_file(str(pending_path))
+    auth = await GOLAuth.from_pending_login_file(str(pending_path))
     try:
         await auth.send_mfa_request(args.code, exchange_commerce=True)
         ensure_session_parent(session_path)
-        auth.save_session_file(str(session_path))
+        await auth.save_session_file(str(session_path))
         pending_path.unlink(missing_ok=True)
     finally:
         await auth.close()
@@ -168,10 +168,10 @@ async def cmd_resend_mfa(args: argparse.Namespace) -> int:
         )
         raise SessionRequiredError(msg)
 
-    auth = GOLAuth.from_pending_login_file(str(pending_path))
+    auth = await GOLAuth.from_pending_login_file(str(pending_path))
     try:
         await auth.request_mfa_code()
-        auth.save_pending_login(str(pending_path))
+        await auth.save_pending_login(str(pending_path))
     finally:
         await auth.close()
 
@@ -185,10 +185,10 @@ async def cmd_resend_mfa(args: argparse.Namespace) -> int:
 async def cmd_refresh(args: argparse.Namespace) -> int:
     """Refresh the commerce session using the saved OAuth access token."""
     session_path = Path(args.session)
-    auth = load_auth(args)
+    auth = await load_auth(args)
     try:
         await auth.refresh_commerce_session()
-        auth.save_session_file(str(session_path))
+        await auth.save_session_file(str(session_path))
     finally:
         await auth.close()
 

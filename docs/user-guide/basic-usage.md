@@ -9,7 +9,7 @@ pattern:
 ```python
 from pysainsburys import GOLAuth, Sainsburys
 
-auth = GOLAuth.from_session_file("~/.config/pysainsburys/session.json")
+auth = await GOLAuth.from_session_file("~/.config/pysainsburys/session.json")
 
 async with Sainsburys(auth) as client:
     customer = await client.get_customer()
@@ -23,14 +23,14 @@ For public endpoints (search, product detail, store lookup), an empty
 
 | Method | When to use |
 | --- | --- |
-| ``GOLAuth.from_session_file(path)`` | Reuse a session saved by the CLI or a previous login |
+| ``await GOLAuth.from_session_file(path)`` | Reuse a session saved by the CLI or a previous login |
 | ``auth.login(email, password)`` | Credential login (MFA supported) |
 | ``auth.send_login_request()`` + ``auth.finish_login(redirect)`` | Browser-based OAuth with PKCE |
 
 After login, persist the session for reuse:
 
 ```python
-auth.save_session_file("~/.config/pysainsburys/session.json")
+await auth.save_session_file("~/.config/pysainsburys/session.json")
 ```
 
 ## Products

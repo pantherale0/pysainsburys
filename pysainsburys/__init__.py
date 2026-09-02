@@ -116,7 +116,9 @@ class Sainsburys:
     Example:
         Authenticated session::
 
-            auth = GOLAuth.from_session_file("~/.config/pysainsburys/session.json")
+            auth = await GOLAuth.from_session_file(
+                "~/.config/pysainsburys/session.json"
+            )
             async with Sainsburys(auth) as client:
                 customer = await client.get_customer()
                 basket = await customer.basket.fetch()

@@ -22,7 +22,7 @@ def ensure_session_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def load_auth(args: argparse.Namespace) -> GOLAuth:
+async def load_auth(args: argparse.Namespace) -> GOLAuth:
     """Load authentication state from the configured session file."""
     session_path = Path(args.session)
     if not session_path.is_file():
@@ -31,12 +31,12 @@ def load_auth(args: argparse.Namespace) -> GOLAuth:
             "Run `pysainsburys auth login` or `pysainsburys auth finish` first."
         )
         raise SessionRequiredError(msg)
-    return GOLAuth.from_session_file(str(session_path))
+    return await GOLAuth.from_session_file(str(session_path))
 
 
 async def with_client(args: argparse.Namespace) -> Sainsburys:
     """Create a Sainsburys client from the configured session."""
-    return Sainsburys(load_auth(args))
+    return Sainsburys(await load_auth(args))
 
 
 async def with_public_client() -> Sainsburys:

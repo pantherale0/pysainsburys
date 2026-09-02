@@ -112,7 +112,8 @@ def test_to_dict_and_iter() -> None:
     assert dict(auth)["wc_auth_token"] == "682092082%2Ctrusted"
 
 
-def test_from_session_file(tmp_path: Path) -> None:
+@pytest.mark.asyncio
+async def test_from_session_file(tmp_path: Path) -> None:
     """Session files can be loaded from disk."""
     path = tmp_path / "session.json"
     path.write_text(
@@ -125,8 +126,14 @@ def test_from_session_file(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    auth = GOLAuth.from_session_file(str(path))
+    auth = await GOLAuth.from_session_file(str(path))
     assert auth.access_token == "oauth-token"
+    out = tmp_path / "session-out.json"
+    await auth.save_session_file(str(out))
+    restored = await GOLAuth.from_session_file(str(out))
+    assert restored.access_token == "oauth-token"
+    await auth.close()
+    await restored.close()
 
 
 @pytest.mark.asyncio

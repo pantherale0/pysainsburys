@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import json
@@ -64,8 +65,8 @@ def is_awaitable(value: object) -> bool:
     return callable(getattr(value, "__await__", None))
 
 
-def load_session_file(path: str) -> dict[str, Any]:
-    """Load a session export JSON file."""
+def _read_session_file(path: str) -> dict[str, Any]:
+    """Load a session export JSON file from disk."""
     with open(path, encoding="utf-8") as handle:
         data = json.load(handle)
     if not isinstance(data, dict):
@@ -74,11 +75,21 @@ def load_session_file(path: str) -> dict[str, Any]:
     return data
 
 
-def save_session_file(path: str, data: dict[str, Any]) -> None:
-    """Write a session export JSON file."""
+def _write_session_file(path: str, data: dict[str, Any]) -> None:
+    """Write a session export JSON file to disk."""
     with open(path, "w", encoding="utf-8") as handle:
         json.dump(data, handle, indent=2, sort_keys=True)
         handle.write("\n")
+
+
+async def load_session_file(path: str) -> dict[str, Any]:
+    """Load a session export JSON file without blocking the event loop."""
+    return await asyncio.to_thread(_read_session_file, path)
+
+
+async def save_session_file(path: str, data: dict[str, Any]) -> None:
+    """Write a session export JSON file without blocking the event loop."""
+    await asyncio.to_thread(_write_session_file, path, data)
 
 
 def call_or_await(callback: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:

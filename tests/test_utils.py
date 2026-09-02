@@ -1,16 +1,22 @@
 """Tests for PKCE and OAuth redirect helpers."""
 
+from pathlib import Path
+
+import pytest
+
 from pysainsburys.utils import (
     build_code_challenge,
     decode_oauth_redirect,
     identity_error_code,
     is_identity_login_url,
     is_identity_mfa_url,
+    load_session_file,
     login_challenge_from_url,
     normalize_wc_auth_token,
     parse_authorization_input,
     random_string,
     resolve_redirect_url,
+    save_session_file,
 )
 
 
@@ -78,3 +84,21 @@ def test_normalize_wc_auth_token_from_api_response() -> None:
         wc_trusted_token="682092082%2Cabc123",
     )
     assert token == "682092082%2Cabc123"
+
+
+@pytest.mark.asyncio
+async def test_session_file_roundtrip(tmp_path: Path) -> None:
+    """Session files round-trip through async load and save."""
+    path = tmp_path / "session.json"
+    payload = {"access_token": "oauth-token", "cookies": {"JSESSIONID": "abc"}}
+    await save_session_file(str(path), payload)
+    assert await load_session_file(str(path)) == payload
+
+
+@pytest.mark.asyncio
+async def test_load_session_file_requires_object(tmp_path: Path) -> None:
+    """Session files must contain a JSON object."""
+    path = tmp_path / "session.json"
+    path.write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="JSON object"):
+        await load_session_file(str(path))
