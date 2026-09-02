@@ -961,7 +961,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pysainsburys<span class=
 <p>Then use the saved session in Python:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pysainsburys</span><span class="w"> </span><span class="kn">import</span> <span class="n">GOLAuth</span><span class="p">,</span> <span class="n">Sainsburys</span>
 
-<span class="n">auth</span> <span class="o">=</span> <span class="n">GOLAuth</span><span class="o">.</span><span class="n">from_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
+<span class="n">auth</span> <span class="o">=</span> <span class="k">await</span> <span class="n">GOLAuth</span><span class="o">.</span><span class="n">from_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">with</span> <span class="n">Sainsburys</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
     <span class="n">customer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_customer</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">customer</span><span class="o">.</span><span class="n">display_name</span><span class="p">)</span>

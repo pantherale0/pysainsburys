@@ -1016,7 +1016,7 @@ session and close it when finished. The async context manager is the simplest
 pattern:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pysainsburys</span><span class="w"> </span><span class="kn">import</span> <span class="n">GOLAuth</span><span class="p">,</span> <span class="n">Sainsburys</span>
 
-<span class="n">auth</span> <span class="o">=</span> <span class="n">GOLAuth</span><span class="o">.</span><span class="n">from_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
+<span class="n">auth</span> <span class="o">=</span> <span class="k">await</span> <span class="n">GOLAuth</span><span class="o">.</span><span class="n">from_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
 
 <span class="k">async</span> <span class="k">with</span> <span class="n">Sainsburys</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
     <span class="n">customer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_customer</span><span class="p">()</span>
@@ -1034,7 +1034,7 @@ pattern:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>GOLAuth.from_session_file(path)</code></td>
+<td><code>await GOLAuth.from_session_file(path)</code></td>
 <td>Reuse a session saved by the CLI or a previous login</td>
 </tr>
 <tr>
@@ -1048,7 +1048,7 @@ pattern:</p>
 </tbody>
 </table>
 <p>After login, persist the session for reuse:</p>
-<div class="highlight"><pre><span></span><code><span class="n">auth</span><span class="o">.</span><span class="n">save_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">auth</span><span class="o">.</span><span class="n">save_session_file</span><span class="p">(</span><span class="s2">"~/.config/pysainsburys/session.json"</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="products">Products<a class="headerlink" href="#products" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="c1"># Search (public)</span>
