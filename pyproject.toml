@@ -58,6 +58,8 @@ docs = [
 
 [tool.ruff]
 line-length = 88
+include = [ "pysainsburys/**/*.py", "tests/**/*.py", "conftest.py" ]
+exclude = [ "artifacts", "docs", "scripts", "site" ]
 lint.select = [
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
@@ -97,7 +99,10 @@ max_supported_python = "3.15"
 [tool.mypy]
 mypy_path = "."
 exclude = [
-  "docs/.*",
+  "artifacts/",
+  "docs/",
+  "scripts/",
+  "site/",
 ]
 disallow_any_generics = true
 disallow_untyped_defs = true
@@ -107,7 +112,6 @@ warn_unused_ignores = true
 warn_unreachable = true
 overrides = [
   { module = "tests.*", allow_untyped_defs = true },
-  { module = "docs.*", ignore_errors = true },
 ]
 no_implicit_optional = true
 show_error_codes = true
