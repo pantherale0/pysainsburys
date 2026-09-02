@@ -23,11 +23,11 @@ jobs:
 
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
 
-      - uses: j178/prek-action@v3
+      - uses: j178/prek-action@v3.0.0
         id: prek
         continue-on-error: true
 
-      - uses: pre-commit-ci/lite-action@v1
+      - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
         with:
           msg: "chore: auto-fix from pre-commit hooks"
