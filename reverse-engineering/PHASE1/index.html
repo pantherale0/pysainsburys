@@ -1,0 +1,1274 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A async integration API for Sainsburys">
+      
+      
+        <meta name="author" content="Jordan Harvey">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Phase 1 — Completion Report - Sainsburys API</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-1-completion-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Sainsburys API" class="md-header__button md-logo" aria-label="Sainsburys API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Sainsburys API
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 1 — Completion Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/pantherale0/pysainsburys" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pysainsburys
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/basic-usage/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/reference/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Sainsburys API" class="md-nav__button md-logo" aria-label="Sainsburys API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Sainsburys API
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/pantherale0/pysainsburys" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    pysainsburys
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/basic-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication lifecycle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication lifecycle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#oauth-oidc-parameters-static-inferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OAuth / OIDC parameters (static + inferred)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commerce-token-exchange" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commerce token exchange
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authenticated-request-headers-live-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authenticated request headers (live-validated)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#live-validated-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live-validated endpoints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response-samples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response samples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protections-phase-2-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protections &amp; Phase 2 implications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tooling-reproducibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tooling &amp; reproducibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-for-phase-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions for Phase 2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="phase-1-completion-report">Phase 1 — Completion Report<a class="headerlink" href="#phase-1-completion-report" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Sainsbury's Groceries (<code>com.sainsburys.gol</code> v3.65.0) · Completed 2026-08-30</p>
+</blockquote>
+<h2 id="executive-summary">Executive summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>Phase 1 reverse-engineered the Sainsbury's Groceries Android app to document its HTTP API, authentication model, and response schemas for smart-home integration. The app is <strong>HTTP-only</strong> (no Bluetooth). Business logic is heavily R8-obfuscated but Retrofit/Ktor interfaces and Gson models retain readable structure under <code>com.sainsburys.gol.*</code>.</p>
+<p>Live validation was performed on a rooted Pixel 4 XL with Frida-instrumented OkHttp hooks. <strong>183 authenticated API requests</strong> were captured across Favourites, Trolley, Shop, and Home tabs. Static schemas were cross-checked against live JSON samples.</p>
+<p><strong>Phase 2</strong> (Python <code>pysainsburys</code> client) is unblocked. The main integration constraint is <strong>Akamai bot protection</strong> (<code>ak_bmsc</code> cookies; optional <code>X-acf-sensor-data</code> header from native BMP SDK).</p>
+<hr />
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>flowchart LR
+  subgraph app [GOL Android App]
+    UI[Compose UI]
+    Retrofit[Retrofit + Ktor/OkHttp]
+    AppAuth[AppAuth OIDC + PKCE]
+  end
+
+  subgraph identity [Identity — My ID]
+    OIDC[account.sainsburys.co.uk]
+  end
+
+  subgraph commerce [Commerce API]
+    GOL[www.sainsburys.co.uk/groceries-api]
+    BFF[gol-app-bff-*.jspaas.uk]
+  end
+
+  UI --&gt; Retrofit
+  AppAuth --&gt; OIDC
+  OIDC --&gt;|authorization code| AppAuth
+  AppAuth --&gt;|access_token| Retrofit
+  Retrofit --&gt;|login-access-token| GOL
+  GOL --&gt;|WC tokens + cookies| Retrofit
+  Retrofit --&gt; GOL
+  Retrofit -.-&gt;|feature flag| BFF
+</code></pre></div>
+<hr />
+<h2 id="authentication-lifecycle">Authentication lifecycle<a class="headerlink" href="#authentication-lifecycle" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Endpoint / storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>OIDC discovery (app startup)</td>
+<td><code>GET https://account.sainsburys.co.uk/.well-known/openid-configuration</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>User login (WebView)</td>
+<td><code>GET …/oauth2/auth</code> + PKCE (<code>code_challenge_method=S256</code>)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Redirect with auth code</td>
+<td><code>sainsburys://oauth/redirect-login</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Token exchange</td>
+<td>Token endpoint from discovery (Ory Hydra — <code>/oauth2/token</code>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Commerce session</td>
+<td><code>POST /groceries-api/gol-services/login/v1/login-access-token</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Session persistence</td>
+<td><code>auth_state.preferences_pb</code>, <code>gol_hybrid.xml</code>, WebView cookies</td>
+</tr>
+<tr>
+<td>7</td>
+<td>API calls</td>
+<td><code>Authorization</code> + <code>WCAuthToken</code> + <code>Cookie</code> headers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="oauth-oidc-parameters-static-inferred">OAuth / OIDC parameters (static + inferred)<a class="headerlink" href="#oauth-oidc-parameters-static-inferred" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issuer / auth base</td>
+<td><code>https://account.sainsburys.co.uk/</code></td>
+</tr>
+<tr>
+<td>Client ID</td>
+<td><code>gol-android</code></td>
+</tr>
+<tr>
+<td>Scopes</td>
+<td><code>openid offline gol-session</code></td>
+</tr>
+<tr>
+<td>Redirect (login)</td>
+<td><code>sainsburys://oauth/redirect-login</code></td>
+</tr>
+<tr>
+<td>Redirect (logout)</td>
+<td><code>sainsburys://oauth/redirect-logout</code></td>
+</tr>
+<tr>
+<td>PKCE</td>
+<td>Required (<code>S256</code>)</td>
+</tr>
+<tr>
+<td>Authorization URL</td>
+<td><code>https://account.sainsburys.co.uk/oauth2/auth</code></td>
+</tr>
+<tr>
+<td>Token URL</td>
+<td><code>https://account.sainsburys.co.uk/oauth2/token</code> (standard Ory Hydra layout)</td>
+</tr>
+<tr>
+<td>Discovery URL</td>
+<td><code>https://account.sainsburys.co.uk/.well-known/openid-configuration</code></td>
+</tr>
+<tr>
+<td>Extra auth params</td>
+<td><code>missionId=gol</code>, <code>audience=gol.sainsburys.co.uk</code>, <code>channel=Android</code>, <code>appVersion=3.65.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Discovery and token endpoints are <strong>Akamai-protected</strong> — direct <code>curl</code> from a datacenter IP returns 403. The app fetches discovery at runtime via AppAuth (<code>AuthorizationServiceConfiguration</code>).</p>
+<h3 id="commerce-token-exchange">Commerce token exchange<a class="headerlink" href="#commerce-token-exchange" title="Permanent link">&para;</a></h3>
+<p><strong>Request</strong> (<code>LoginAccessPayload</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;oauth_access_token&gt;"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"food_profile_create"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>Response</strong> (<code>WCSTokenEntity</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"personalization_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1740501147938-35"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"user_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"682092082"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"wc_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"wc_trusted_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Validated IDs for test account: customer ID <code>168292530</code> (plain prefs), commerce user ID <code>682092082</code> (WC cookies).</p>
+<h3 id="authenticated-request-headers-live-validated">Authenticated request headers (live-validated)<a class="headerlink" href="#authenticated-request-headers-live-validated" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="err">Authorization: Bearer &lt;JWT RS256, ~1229 chars&gt;</span>
+<span class="err">WCAuthToken: 682092082%2C&lt;wc_trusted_token&gt;</span>
+<span class="err">Cookie: ak_bmsc=…; WC_AUTHENTICATION_682092082=…; WC_SESSION_ESTABLISHED=true; JSESSIONID=…; AWSALB=…</span>
+<span class="err">User-Agent: GOLAppAndroid/3.65.0</span>
+<span class="err">Content-Type: application/json; charset=UTF-8</span>
+</code></pre></div>
+<ul>
+<li><code>WCAuthToken</code> format: URL-encoded <code>{user_id},{wc_trusted_token}</code></li>
+<li><code>refresh_token</code> header appears on token-refresh flows only, not routine GETs</li>
+<li>Store context query params: <code>store_identifier=0474</code>, <code>personalization_id=…</code>, <code>slot_type=none</code></li>
+</ul>
+<hr />
+<h2 id="live-validated-endpoints">Live-validated endpoints<a class="headerlink" href="#live-validated-endpoints" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Tab / trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/product/v1/favourites</code></td>
+<td>Favourites</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/product/v1/favourites-by-pattern</code></td>
+<td>Favourites (seasonal/usuals)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/product/v1/recommendations</code></td>
+<td>Favourites</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/product/v1/product/meganav</code></td>
+<td>Shop</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/product/v1/product/taxonomy</code></td>
+<td>Shop</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/basket/v2/basket</code></td>
+<td>Trolley</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/customer/v1/customer/address</code></td>
+<td>Account context</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/order/v1/order</code></td>
+<td>Orders</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/content/v2/withMagnoliaTemplate/ads</code></td>
+<td>Home</td>
+</tr>
+</tbody>
+</table>
+<p>Full API reference: <a href="../API/"><code>API.md</code></a></p>
+<hr />
+<h2 id="response-samples">Response samples<a class="headerlink" href="#response-samples" title="Permanent link">&para;</a></h2>
+<p>Live-captured JSON excerpts (no auth tokens) in <a href="samples/"><code>samples/</code></a>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Endpoint</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../samples/favourites-product.excerpt.json"><code>favourites-product.excerpt.json</code></a></td>
+<td><code>GET …/favourites</code></td>
+<td>Single product + pagination controls</td>
+</tr>
+<tr>
+<td><a href="../samples/order-list.empty.json"><code>order-list.empty.json</code></a></td>
+<td><code>GET …/order</code></td>
+<td>Empty order history shape</td>
+</tr>
+<tr>
+<td><a href="../samples/remote-config.excerpt.json"><code>remote-config.excerpt.json</code></a></td>
+<td>S3 config</td>
+<td>Public, no auth</td>
+</tr>
+</tbody>
+</table>
+<p>Static Gson models in <code>artifacts/…/com/sainsburys/gol/models/entities/</code> match live field names (<code>snake_case</code> JSON keys).</p>
+<hr />
+<h2 id="protections-phase-2-implications">Protections &amp; Phase 2 implications<a class="headerlink" href="#protections-phase-2-implications" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Protection</th>
+<th>Evidence</th>
+<th>Impact on Python client</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Akamai Bot Manager</strong></td>
+<td><code>libakamaibmp.so</code>, <code>ak_bmsc</code> cookie on app requests</td>
+<td><strong>Not required</strong> for authenticated API calls when WC session is valid (live test 2026-08-30). WC cookies + <code>WCAuthToken</code> are the real session binders</td>
+</tr>
+<tr>
+<td><strong>Certificate pinning</strong></td>
+<td>OkHttp <code>CertificatePinner</code></td>
+<td>TLS interception requires bypass or direct API with valid session</td>
+</tr>
+<tr>
+<td><strong>OAuth + WC dual auth</strong></td>
+<td>Bearer JWT + WCAuthToken + cookies</td>
+<td>Client needs both token layers</td>
+</tr>
+<tr>
+<td><strong>Play sideload check</strong></td>
+<td>Pair IP <code>LicenseClient</code></td>
+<td>N/A for API client</td>
+</tr>
+<tr>
+<td><strong>BFF routing</strong></td>
+<td>OkHttp interceptor rewrites paths</td>
+<td>May need BFF host for basket/checkout/slot when flag enabled</td>
+</tr>
+<tr>
+<td><strong>Root detection</strong></td>
+<td><code>libtoolChecker.so</code></td>
+<td>N/A for API client</td>
+</tr>
+</tbody>
+</table>
+<p><code>X-acf-sensor-data</code> was <strong>not observed</strong> on routine browse traffic after login. Live curl tests (2026-08-30) confirmed <strong><code>ak_bmsc</code> / <code>bm_sz</code> / <code>_abck</code> cookies are not required</strong> for authenticated grocery API calls when <code>WCAuthToken</code> and WC session cookies (<code>WC_*</code>, <code>JSESSIONID</code>) are present. Without WC cookies, basket returns HTTP 200 with an empty guest basket; favourites returns HTTP 401.</p>
+<hr />
+<h2 id="tooling-reproducibility">Tooling &amp; reproducibility<a class="headerlink" href="#tooling-reproducibility" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>artifacts/scripts/run_live_capture.py</code></td>
+<td>Automated header + URL capture</td>
+</tr>
+<tr>
+<td><code>artifacts/scripts/capture_response_samples.py</code></td>
+<td>Response body sampling</td>
+</tr>
+<tr>
+<td><code>artifacts/scripts/live_capture.js</code></td>
+<td>Frida OkHttp hooks</td>
+</tr>
+<tr>
+<td><code>artifacts/scripts/capture.js</code></td>
+<td>SSL pinning + license bypass (mitmproxy)</td>
+</tr>
+<tr>
+<td><code>artifacts/scripts/attach_capture.py</code></td>
+<td>Frida CLI wrapper</td>
+</tr>
+</tbody>
+</table>
+<p>Capture recipe: clear app cache → cold start → attach Frida CLI → navigate tabs.</p>
+<p>Raw captures (gitignored): <code>artifacts/captures/live-capture.log</code>, <code>response-samples.json</code></p>
+<hr />
+<h2 id="open-questions-for-phase-2">Open questions for Phase 2<a class="headerlink" href="#open-questions-for-phase-2" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Akamai bypass strategy</strong> — live tests show <code>ak_bmsc</code>/<code>bm_sz</code>/<code>_abck</code> are <strong>not</strong> needed with a valid WC session; focus on OAuth + WC token exchange instead</li>
+<li><strong>BFF feature flag</strong> — confirm whether v3.65.0 routes basket/checkout via BFF in production</li>
+<li><strong>Token refresh</strong> — capture <code>refresh_token</code> header flow when access token expires</li>
+<li><strong>Write operations</strong> — validate <code>POST …/basket/item</code> request/response with a test add-to-basket</li>
+<li><strong>Smart-home priority workflows</strong> — basket, orders, slots, favourites (user preference)</li>
+</ol>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../NOTEBOOK/"><code>NOTEBOOK.md</code></a> — research log</li>
+<li><a href="../API/"><code>API.md</code></a> — full endpoint reference</li>
+<li><a href="https://medium.com/sainsburys-engineering/my-id-is-bringing-our-products-closer-together-fdbc988a0103">Sainsbury's My ID engineering post</a> — Ory Hydra OAuth stack</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
