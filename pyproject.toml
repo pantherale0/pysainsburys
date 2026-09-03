@@ -4,7 +4,6 @@ requires = [ "setuptools>=77.0.3" ]
 
 [project]
 name = "pysainsburys"
-version = "0.0.0"
 description = "A async integration API for Sainsburys"
 readme = "README.md"
 license = "Apache-2.0"
@@ -28,8 +27,8 @@ classifiers = [
 dependencies = [
   "aiofiles>=25.1.0",
   "aiohttp>=3.9",
-  "ruff>=0.16.5",
 ]
+dynamic = ["version"]
 
 [project.scripts]
 pysainsburys = "pysainsburys.cli:main"

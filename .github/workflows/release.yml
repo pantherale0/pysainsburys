@@ -19,7 +19,7 @@ jobs:
 
       - name: Update version
         run: |
-          filepath="pysainsburys/__init__.py"
+          filepath="pysainsburys/_version.py"
           new_version_string="__version__ = \"${{ github.event.release.tag_name }}\""
           sed -i "s/^__version__ = .*$/$new_version_string/" "$filepath"
 
