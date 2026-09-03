@@ -42,6 +42,9 @@ repository = "https://github.com/pantherale0/pysainsburys"
 where = [ "." ]
 include = [ "pysainsburys*" ]
 
+[tool.setuptools.dynamic]
+version = { attr = "pysainsburys._version.__version__" }
+
 [dependency-groups]
 dev = [
   "coverage",
