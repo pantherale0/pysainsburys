@@ -53,7 +53,7 @@ from .models import (
 )
 from .nectar import Nectar
 from .orders import OrderHandle, Orders
-from .slots import Slots, build_list_slots_payload
+from .slots import Slots, build_list_slots_payload, build_reserve_slot_payload
 from .utils import is_awaitable
 
 __all__ = [
@@ -101,6 +101,7 @@ __all__ = [
     "bind_store",
     "bind_stores",
     "build_list_slots_payload",
+    "build_reserve_slot_payload",
 ]
 
 _LOGGER = logging.getLogger(__name__)

@@ -239,6 +239,20 @@ See [`API.md`](API.md) SmartShop and Product Finder sections for endpoint tables
 4. **SmartShop live capture** for barcode → product resolution
 5. Prioritise smart-home workflows with user
 
+### Slot reservation implementation (2026-09-04)
+
+- Added client support for listing delivery/collection slots, reading location
+  context and reservation state, reserving/changing a slot, and validating the
+  reservation.
+- The `POST …/slot/v1/slot/reservation` body is conservatively inferred from
+  the Android payload/model names and known response fields. Unknown fields are
+  omitted.
+- Request/response fixtures under `docs/reverse-engineering/samples/` are
+  synthetic. A live Android-style commerce-session capture is still required
+  before reservation writes can be considered verified.
+- Address selection (`POST …/reservation/address`) and delivery-information
+  remain follow-up work because their payload/response schemas are incomplete.
+
 ### Live API capture (2026-08-30)
 
 Automated capture via `uv run python artifacts/scripts/run_live_capture.py`:

@@ -151,3 +151,35 @@ def test_parser_slots_reservation_command() -> None:
     """Slots reservation command is parsed."""
     args = build_parser().parse_args(["slots", "reservation"])
     assert args.slots_command == "reservation"
+
+
+def test_parser_slots_reserve_command() -> None:
+    """Slots reserve command parses slot and collection context."""
+    args = build_parser().parse_args(
+        [
+            "slots",
+            "reserve",
+            "slot-123",
+            "--type",
+            "collection",
+            "--location-uid",
+            "location-123",
+            "--no-context",
+        ]
+    )
+    assert args.slots_command == "reserve"
+    assert args.slot_uid == "slot-123"
+    assert args.slot_type is SlotType.COLLECTION
+    assert args.location_uid == "location-123"
+    assert args.no_context is True
+
+
+def test_parser_slots_validate_and_context_commands() -> None:
+    """Slots validate and context commands are registered."""
+    validate = build_parser().parse_args(
+        ["slots", "validate", "--order-uid", "order-123"]
+    )
+    context = build_parser().parse_args(["slots", "context"])
+    assert validate.slots_command == "validate"
+    assert validate.order_uid == "order-123"
+    assert context.slots_command == "context"

@@ -20,4 +20,9 @@ def test_gol_endpoints_include_slot_listing() -> None:
     assert slots["endpoint"].endswith("/slot/v2/slots")
     assert slots["headers"] == {"X-Http-Method-Override": "GET"}
     assert GOL_ENDPOINTS["get_slot_reservation"]["method"] == "GET"
+    assert GOL_ENDPOINTS["create_slot_reservation"]["method"] == "POST"
+    assert GOL_ENDPOINTS["validate_slot_reservation"]["method"] == "GET"
+    assert GOL_ENDPOINTS["validate_slot_reservation"]["endpoint"].endswith(
+        "/slot/v1/slot/reservation/validate"
+    )
     assert GOL_ENDPOINTS["get_slot_location_context"]["method"] == "GET"

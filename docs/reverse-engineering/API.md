@@ -280,6 +280,36 @@ GET https://www.sainsburys.co.uk/groceries-api/gol-services/product/v1/product/s
 | POST | `/groceries-api/gol-services/slot/v1/slot/reservation/address` | `SlotAddressPayload` | empty |
 | POST | `/groceries-api/gol-services/slot/v2/slots` | `SlotPayload` (header: `X-Http-Method-Override: GET`) | `SlotWeekEntity` |
 
+### Reserve or change a slot
+
+The Android model names identify separate `SlotReservationPayload` and
+`ConfirmSlotPayload` types, but their complete field sets were not retained in
+the checked-in decompilation notes. The Python client therefore uses this
+conservative inferred payload, omitting values that are not known:
+
+```json
+{
+  "slot_type": "DELIVERY",
+  "slot_uid": "slot-delivery-0630",
+  "start_time": "2026-03-07T06:30:00Z",
+  "end_time": "2026-03-07T07:30:00Z",
+  "store_identifier": "0474",
+  "postcode": "SW1A1AA"
+}
+```
+
+For click-and-collect, `slot_type` is `CLICK_AND_COLLECT` and the payload may
+include `location_uid`. `order_uid` may be included while amending an order.
+Changing a reservation uses the same POST with the replacement slot.
+
+The request and response examples in
+[`samples/slot-reservation.request.example.json`](samples/slot-reservation.request.example.json)
+and
+[`samples/slot-reservation.response.example.json`](samples/slot-reservation.response.example.json)
+are synthetic and have not been live-captured. Direct web sessions have been
+reported to reject reservation writes, so callers must treat this endpoint as
+experimental until it is validated with an Android-style commerce session.
+
 ---
 
 ## Checkout

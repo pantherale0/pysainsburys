@@ -11,7 +11,12 @@ import pytest
 from pysainsburys import Sainsburys
 from pysainsburys.auth import GOLAuth
 from pysainsburys.enum import SlotType
-from pysainsburys.slots import Slots, build_list_slots_payload
+from pysainsburys.models.slot import DeliverySlot
+from pysainsburys.slots import (
+    Slots,
+    build_list_slots_payload,
+    build_reserve_slot_payload,
+)
 
 SAMPLES = Path(__file__).resolve().parents[1] / "docs/reverse-engineering/samples"
 SLOT_WEEK_SAMPLE = json.loads(
@@ -61,6 +66,22 @@ def test_build_list_slots_payload_maps_collection_type() -> None:
         location_uid="loc-123",
     )
     assert payload["slot_type"] == "CLICK_AND_COLLECT"
+
+
+def test_build_reserve_slot_payload_omits_unknowns() -> None:
+    """Reservation payloads normalize postcodes and omit unknown values."""
+    payload = build_reserve_slot_payload(
+        slot_type=SlotType.DELIVERY,
+        slot_uid="slot-delivery-0630",
+        start_time="2026-03-07T06:30:00Z",
+        postcode="sw1a 1aa",
+    )
+    assert payload == {
+        "slot_type": "DELIVERY",
+        "slot_uid": "slot-delivery-0630",
+        "start_time": "2026-03-07T06:30:00Z",
+        "postcode": "SW1A1AA",
+    }
 
 
 @pytest.mark.asyncio
@@ -150,6 +171,101 @@ async def test_fetch_reservation(client: Sainsburys) -> None:
     assert reservation.slot.price == 4.0
     client.api.send_request.assert_awaited_with(
         endpoint="get_slot_reservation", params=None
+    )
+
+
+@pytest.mark.asyncio
+async def test_reserve_delivery_slot_uses_location_context(
+    client: Sainsburys,
+) -> None:
+    """Reserving a parsed slot fills location fields and caches the response."""
+    response = {
+        "reservation_type": "delivery",
+        "postcode": "SW1A1AA",
+        "store_identifier": "0474",
+        "slot": {
+            "slot_uid": "slot-delivery-0630",
+            "start_time": "2026-03-07T06:30:00Z",
+            "end_time": "2026-03-07T07:30:00Z",
+        },
+    }
+    client.api.send_request = AsyncMock(
+        side_effect=[
+            {"user_id": "682092082"},
+            {
+                "slot_type": "delivery",
+                "postcode": "SW1A1AA",
+                "store_identifier": "0474",
+            },
+            response,
+        ]
+    )
+
+    customer = await client.get_customer()
+    slot = DeliverySlot(
+        slot_uid="slot-delivery-0630",
+        start_time="2026-03-07T06:30:00Z",
+        end_time="2026-03-07T07:30:00Z",
+        slot_type="delivery",
+    )
+    reservation = await customer.slots.reserve(slot)
+
+    assert reservation.slot is not None
+    assert reservation.slot.slot_uid == "slot-delivery-0630"
+    assert customer.slots.cached_reservation is reservation
+    call = client.api.send_request.await_args_list[-1]
+    assert call.kwargs["endpoint"] == "create_slot_reservation"
+    assert call.kwargs["body"] == {
+        "slot_type": "DELIVERY",
+        "slot_uid": "slot-delivery-0630",
+        "start_time": "2026-03-07T06:30:00Z",
+        "end_time": "2026-03-07T07:30:00Z",
+        "store_identifier": "0474",
+        "postcode": "SW1A1AA",
+    }
+
+
+@pytest.mark.asyncio
+async def test_reserve_collection_slot_without_context(client: Sainsburys) -> None:
+    """Collection reservations use the click-and-collect API value."""
+    client.api.send_request = AsyncMock(
+        side_effect=[
+            {"user_id": "682092082"},
+            {"reservation_type": "collection"},
+        ]
+    )
+
+    customer = await client.get_customer()
+    await customer.slots.reserve(
+        "slot-collection-0900",
+        slot_type=SlotType.COLLECTION,
+        store_identifier="0474",
+        location_uid="location-123",
+        use_location_context=False,
+    )
+
+    body = client.api.send_request.await_args_list[-1].kwargs["body"]
+    assert body["slot_type"] == "CLICK_AND_COLLECT"
+    assert body["location_uid"] == "location-123"
+
+
+@pytest.mark.asyncio
+async def test_validate_reservation(client: Sainsburys) -> None:
+    """Reservation validation forwards amend order context and caches state."""
+    client.api.send_request = AsyncMock(
+        side_effect=[
+            {"user_id": "682092082"},
+            {"reservation_type": "delivery", "is_expired": False},
+        ]
+    )
+
+    customer = await client.get_customer()
+    reservation = await customer.slots.validate(order_uid="order-123")
+
+    assert customer.slots.cached_reservation is reservation
+    client.api.send_request.assert_awaited_with(
+        endpoint="validate_slot_reservation",
+        params={"order_uid": "order-123"},
     )
 
 

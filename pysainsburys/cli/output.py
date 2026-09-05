@@ -242,6 +242,19 @@ def emit_slot_reservation(reservation: Any, *, as_json: bool) -> None:
         print("Slot:     none reserved")
 
 
+def emit_location_context(context: Any, *, as_json: bool) -> None:
+    """Print the location context used for slot operations."""
+    if as_json:
+        emit_json(context.to_dict())
+        return
+    print(f"Type:         {context.slot_type or '-'}")
+    print(f"Postcode:     {context.postcode or '-'}")
+    print(f"Store:        {context.store_identifier or '-'}")
+    print(f"Location UID: {context.location_uid or '-'}")
+    print(f"Region:       {context.region or '-'}")
+    print(f"Order UID:    {context.order_uid or '-'}")
+
+
 def emit_product(product: Any, *, as_json: bool) -> None:
     """Print a single catalogue product."""
     if as_json:

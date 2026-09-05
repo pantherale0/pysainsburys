@@ -6,12 +6,16 @@ from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from .enum import SlotType
-from .models.slot import LocationContext, SlotReservation, SlotWeek
+from .models.slot import DeliverySlot, LocationContext, SlotReservation, SlotWeek
 
 if TYPE_CHECKING:
     from .api import API
 
-__all__ = ["Slots", "build_list_slots_payload"]
+__all__ = [
+    "Slots",
+    "build_list_slots_payload",
+    "build_reserve_slot_payload",
+]
 
 
 def build_list_slots_payload(
@@ -44,6 +48,56 @@ def build_list_slots_payload(
     if order_uid is not None:
         payload["order_uid"] = order_uid
     return payload
+
+
+def build_reserve_slot_payload(
+    *,
+    slot_type: SlotType,
+    slot_uid: str,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    store_identifier: str | None = None,
+    postcode: str | None = None,
+    location_uid: str | None = None,
+    order_uid: str | None = None,
+) -> dict[str, Any]:
+    """
+    Build the inferred ``SlotReservationPayload`` body.
+
+    The payload follows static Android model analysis and has not yet been
+    validated against a live reservation write. Unknown values are omitted.
+    """
+    if not slot_uid:
+        raise ValueError("slot_uid must not be empty.")
+
+    payload: dict[str, Any] = {
+        "slot_type": slot_type.api_value,
+        "slot_uid": slot_uid,
+    }
+    optional_fields = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "store_identifier": store_identifier,
+        "postcode": postcode.replace(" ", "").upper() if postcode else None,
+        "location_uid": location_uid,
+        "order_uid": order_uid,
+    }
+    payload.update(
+        {key: value for key, value in optional_fields.items() if value is not None}
+    )
+    return payload
+
+
+def _parse_slot_type(value: str | None) -> SlotType | None:
+    """Map API slot type strings to the public enum."""
+    if value is None:
+        return None
+    normalized = value.strip().lower().replace("-", "_")
+    if normalized == "delivery":
+        return SlotType.DELIVERY
+    if normalized in {"collection", "click_and_collect"}:
+        return SlotType.COLLECTION
+    return None
 
 
 def _default_week_start_date() -> str:
@@ -99,6 +153,91 @@ class Slots:
         context = LocationContext.from_dict(response)
         self._location_context_cache = context
         return context
+
+    async def reserve(
+        self,
+        slot: DeliverySlot | str,
+        *,
+        slot_type: SlotType | None = None,
+        start_time: str | None = None,
+        end_time: str | None = None,
+        store_identifier: str | None = None,
+        postcode: str | None = None,
+        location_uid: str | None = None,
+        order_uid: str | None = None,
+        use_location_context: bool = True,
+    ) -> SlotReservation:
+        """
+        Reserve a slot, or replace the current reservation with another slot.
+
+        This write path is inferred from static Android models and has not yet
+        been validated against a live commerce session.
+        """
+        if isinstance(slot, DeliverySlot):
+            slot_uid = slot.slot_uid
+            start_time = start_time or slot.start_time
+            end_time = end_time or slot.end_time
+            slot_type = slot_type or _parse_slot_type(slot.slot_type)
+        else:
+            slot_uid = slot
+
+        if not slot_uid:
+            raise ValueError("The selected slot does not have a slot_uid.")
+
+        if slot_type is None and self._week_cache is not None:
+            slot_type = self._week_cache.slot_type
+
+        if use_location_context:
+            context = await self.fetch_location_context()
+            slot_type = slot_type or _parse_slot_type(context.slot_type)
+            store_identifier = store_identifier or context.store_identifier
+            postcode = postcode or context.postcode
+            location_uid = location_uid or context.location_uid
+            order_uid = order_uid or context.order_uid
+
+        if slot_type is None:
+            msg = (
+                "slot_type could not be inferred; pass slot_type, list slots first, "
+                "or enable location context."
+            )
+            raise ValueError(msg)
+
+        body = build_reserve_slot_payload(
+            slot_type=slot_type,
+            slot_uid=slot_uid,
+            start_time=start_time,
+            end_time=end_time,
+            store_identifier=store_identifier,
+            postcode=postcode,
+            location_uid=location_uid,
+            order_uid=order_uid,
+        )
+        response = await self._api.send_request(
+            endpoint="create_slot_reservation",
+            body=body,
+        )
+        if not isinstance(response, dict):
+            msg = "Slot reservation response was not a JSON object."
+            raise TypeError(msg)
+        reservation = SlotReservation.from_dict(response)
+        self._reservation_cache = reservation
+        return reservation
+
+    async def validate(self, *, order_uid: str | None = None) -> SlotReservation:
+        """Validate the customer's current slot reservation."""
+        params: dict[str, str | int | float | bool] | None = (
+            {"order_uid": order_uid} if order_uid else None
+        )
+        response = await self._api.send_request(
+            endpoint="validate_slot_reservation",
+            params=params,
+        )
+        if not isinstance(response, dict):
+            msg = "Slot reservation validation response was not a JSON object."
+            raise TypeError(msg)
+        reservation = SlotReservation.from_dict(response)
+        self._reservation_cache = reservation
+        return reservation
 
     async def list(
         self,

@@ -89,6 +89,10 @@ for slot in week.available_slots:
 
 collection = await customer.slots.list_collection(store_identifier="0474")
 reservation = await customer.slots.fetch_reservation()
+
+# Reserve a listed slot, or use the same method to change the current slot.
+reservation = await customer.slots.reserve(week.available_slots[0])
+reservation = await customer.slots.validate()
 ```
 
 CLI examples::
@@ -96,10 +100,17 @@ CLI examples::
     pysainsburys slots list --type delivery
     pysainsburys slots list --type collection --store 0474
     pysainsburys slots reservation
+    pysainsburys slots reserve SLOT_UID --type delivery
+    pysainsburys slots validate
+    pysainsburys slots context
 
 The list call uses ``POST /slot/v2/slots`` with ``X-Http-Method-Override: GET``.
 Location context is fetched automatically unless ``--no-context`` is passed on
 the CLI or ``use_location_context=False`` in Python.
+
+Slot reservation writes use the statically inferred
+``POST /slot/v1/slot/reservation`` payload. They have not yet been verified
+against a live commerce session and should be treated as experimental.
 
 ## Customer resources
 
@@ -160,7 +171,7 @@ Command groups mirror the library modules:
 | `basket` | `show`, `add`, `set`, `remove`, `clear` |
 | `favourites` | `list`, `add`, `remove` |
 | `orders` | `list`, `show`, `status` |
-| `slots` | `list`, `reservation` |
+| `slots` | `list`, `reservation`, `reserve`, `validate`, `context` |
 | `product` | `show`, `search` |
 | `store` | `near`, `postcode`, `show`, `search` |
 

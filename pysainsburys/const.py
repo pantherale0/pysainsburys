@@ -159,6 +159,14 @@ GOL_ENDPOINTS: dict[str, EndpointSpec] = {
         "method": "GET",
         "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation",
     },
+    "create_slot_reservation": {
+        "method": "POST",
+        "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation",
+    },
+    "validate_slot_reservation": {
+        "method": "GET",
+        "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation/validate",
+    },
     "get_slot_location_context": {
         "method": "GET",
         "endpoint": f"{GOL_API_PREFIX}/slot/v1/slot/reservation/location-context",
