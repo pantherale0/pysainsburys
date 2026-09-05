@@ -956,6 +956,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#slot-reservation-implementation-2026-09-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slot reservation implementation (2026-09-04)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#live-api-capture-2026-08-30" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1492,6 +1503,20 @@ SmartShop-enabled store (scan QR → scan product barcode). Zero SmartShop reque
 <li><strong>SmartShop live capture</strong> for barcode → product resolution</li>
 <li>Prioritise smart-home workflows with user</li>
 </ol>
+<h3 id="slot-reservation-implementation-2026-09-04">Slot reservation implementation (2026-09-04)<a class="headerlink" href="#slot-reservation-implementation-2026-09-04" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Added client support for listing delivery/collection slots, reading location
+  context and reservation state, reserving/changing a slot, and validating the
+  reservation.</li>
+<li>The <code>POST …/slot/v1/slot/reservation</code> body is conservatively inferred from
+  the Android payload/model names and known response fields. Unknown fields are
+  omitted.</li>
+<li>Request/response fixtures under <code>docs/reverse-engineering/samples/</code> are
+  synthetic. A live Android-style commerce-session capture is still required
+  before reservation writes can be considered verified.</li>
+<li>Address selection (<code>POST …/reservation/address</code>) and delivery-information
+  remain follow-up work because their payload/response schemas are incomplete.</li>
+</ul>
 <h3 id="live-api-capture-2026-08-30">Live API capture (2026-08-30)<a class="headerlink" href="#live-api-capture-2026-08-30" title="Permanent link">&para;</a></h3>
 <p>Automated capture via <code>uv run python artifacts/scripts/run_live_capture.py</code>:</p>
 <ul>

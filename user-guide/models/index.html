@@ -1153,10 +1153,13 @@ to parse raw API payloads directly.</p>
 </tr>
 </tbody>
 </table>
-<p>Listing helpers live in :class:<code>~pysainsburys.slots.Slots</code> on <code>customer.slots</code>.</p>
+<p>Listing, reservation, and validation helpers live in
+:class:<code>~pysainsburys.slots.Slots</code> on <code>customer.slots</code>.</p>
 <p><strong>Note:</strong> The slot week list endpoint was mapped from static analysis but not
 live-captured in Phase 1. Some accounts or environments may block direct API
-access; see the reverse-engineering docs for limitations.</p>
+access. The reservation write payload is also inferred and remains
+experimental until live-captured; see the reverse-engineering docs for
+limitations.</p>
 <h2 id="order">Order<a class="headerlink" href="#order" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

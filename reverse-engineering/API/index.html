@@ -936,6 +936,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Slots (delivery / collection)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reserve-or-change-a-slot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reserve or change a slot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1932,6 +1949,30 @@
 </tr>
 </tbody>
 </table>
+<h3 id="reserve-or-change-a-slot">Reserve or change a slot<a class="headerlink" href="#reserve-or-change-a-slot" title="Permanent link">&para;</a></h3>
+<p>The Android model names identify separate <code>SlotReservationPayload</code> and
+<code>ConfirmSlotPayload</code> types, but their complete field sets were not retained in
+the checked-in decompilation notes. The Python client therefore uses this
+conservative inferred payload, omitting values that are not known:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"slot_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DELIVERY"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"slot_uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"slot-delivery-0630"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"start_time"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-07T06:30:00Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"end_time"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-07T07:30:00Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"store_identifier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0474"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SW1A1AA"</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>For click-and-collect, <code>slot_type</code> is <code>CLICK_AND_COLLECT</code> and the payload may
+include <code>location_uid</code>. <code>order_uid</code> may be included while amending an order.
+Changing a reservation uses the same POST with the replacement slot.</p>
+<p>The request and response examples in
+<a href="../samples/slot-reservation.request.example.json"><code>samples/slot-reservation.request.example.json</code></a>
+and
+<a href="../samples/slot-reservation.response.example.json"><code>samples/slot-reservation.response.example.json</code></a>
+are synthetic and have not been live-captured. Direct web sessions have been
+reported to reject reservation writes, so callers must treat this endpoint as
+experimental until it is validated with an Android-style commerce session.</p>
 <hr />
 <h2 id="checkout">Checkout<a class="headerlink" href="#checkout" title="Permanent link">&para;</a></h2>
 <table>

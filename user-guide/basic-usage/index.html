@@ -1091,15 +1091,25 @@ pysainsburys basket clear
 
 <span class="n">collection</span> <span class="o">=</span> <span class="k">await</span> <span class="n">customer</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">list_collection</span><span class="p">(</span><span class="n">store_identifier</span><span class="o">=</span><span class="s2">"0474"</span><span class="p">)</span>
 <span class="n">reservation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">customer</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">fetch_reservation</span><span class="p">()</span>
+
+<span class="c1"># Reserve a listed slot, or use the same method to change the current slot.</span>
+<span class="n">reservation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">customer</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">week</span><span class="o">.</span><span class="n">available_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">reservation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">customer</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 </code></pre></div>
 <p>CLI examples::</p>
 <div class="highlight"><pre><span></span><code>pysainsburys slots list --type delivery
 pysainsburys slots list --type collection --store 0474
 pysainsburys slots reservation
+pysainsburys slots reserve SLOT_UID --type delivery
+pysainsburys slots validate
+pysainsburys slots context
 </code></pre></div>
 <p>The list call uses <code>POST /slot/v2/slots</code> with <code>X-Http-Method-Override: GET</code>.
 Location context is fetched automatically unless <code>--no-context</code> is passed on
 the CLI or <code>use_location_context=False</code> in Python.</p>
+<p>Slot reservation writes use the statically inferred
+<code>POST /slot/v1/slot/reservation</code> payload. They have not yet been verified
+against a live commerce session and should be treated as experimental.</p>
 <h2 id="customer-resources">Customer resources<a class="headerlink" href="#customer-resources" title="Permanent link">&para;</a></h2>
 <p>Authenticated helpers hang off :class:<code>~pysainsburys.models.customer.Customer</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">customer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_customer</span><span class="p">()</span>
@@ -1164,7 +1174,7 @@ favourites, orders, and the latest order status in one pass:</p>
 </tr>
 <tr>
 <td><code>slots</code></td>
-<td><code>list</code>, <code>reservation</code></td>
+<td><code>list</code>, <code>reservation</code>, <code>reserve</code>, <code>validate</code>, <code>context</code></td>
 </tr>
 <tr>
 <td><code>product</code></td>
