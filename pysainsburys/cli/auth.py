@@ -10,7 +10,7 @@ from pathlib import Path
 
 from ..auth import GOLAuth
 from ..exceptions import MFARequiredError, SessionRequiredError
-from .output import emit_json
+from .output import emit_machine
 from .session import ensure_session_parent, load_auth, with_client
 
 CommandHandler = Callable[[argparse.Namespace], Awaitable[int]]
@@ -28,9 +28,11 @@ async def cmd_url(args: argparse.Namespace) -> int:
         url = await auth.send_login_request()
     finally:
         await auth.close()
-    if args.json:
-        emit_json({"authorization_url": url})
-    else:
+    if not emit_machine(
+        {"authorization_url": url},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(url)
     return 0
 
@@ -45,9 +47,11 @@ async def cmd_finish(args: argparse.Namespace) -> int:
         await auth.save_session_file(str(session_path))
     finally:
         await auth.close()
-    if args.json:
-        emit_json({"session": str(session_path), "user_id": auth.user_id})
-    else:
+    if not emit_machine(
+        {"session": str(session_path), "user_id": auth.user_id},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Session saved to {session_path}")
     return 0
 
@@ -62,21 +66,21 @@ async def complete_mfa_login(
     if args.mfa_code:
         mfa_code = args.mfa_code
     elif sys.stdin.isatty():
-        if not args.json:
+        if not args.json and not args.raw:
             print("Verification code sent. Check your email or phone.")
         mfa_code = input("MFA code: ").strip()
     else:
         pending_path = pending_login_path(session_path)
         ensure_session_parent(pending_path)
         await auth.save_pending_login(str(pending_path))
-        if args.json:
-            emit_json(
-                {
-                    "mfa_required": True,
-                    "pending_login": str(pending_path),
-                }
-            )
-        else:
+        if not emit_machine(
+            {
+                "mfa_required": True,
+                "pending_login": str(pending_path),
+            },
+            as_json=args.json,
+            raw=args.raw,
+        ):
             print(
                 f"Verification code sent. Complete sign-in with:\n"
                 f"  pysainsburys auth mfa CODE --pending {pending_path}",
@@ -90,9 +94,11 @@ async def complete_mfa_login(
     pending_path = pending_login_path(session_path)
     if pending_path.is_file():
         pending_path.unlink()
-    if args.json:
-        emit_json({"session": str(session_path), "user_id": auth.user_id})
-    else:
+    if not emit_machine(
+        {"session": str(session_path), "user_id": auth.user_id},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Signed in. Session saved to {session_path}")
     return 0
 
@@ -118,9 +124,11 @@ async def cmd_login(args: argparse.Namespace) -> int:
     finally:
         await auth.close()
 
-    if args.json:
-        emit_json({"session": str(session_path), "user_id": auth.user_id})
-    else:
+    if not emit_machine(
+        {"session": str(session_path), "user_id": auth.user_id},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Signed in. Session saved to {session_path}")
     return 0
 
@@ -148,9 +156,11 @@ async def cmd_mfa(args: argparse.Namespace) -> int:
     finally:
         await auth.close()
 
-    if args.json:
-        emit_json({"session": str(session_path), "user_id": auth.user_id})
-    else:
+    if not emit_machine(
+        {"session": str(session_path), "user_id": auth.user_id},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Signed in. Session saved to {session_path}")
     return 0
 
@@ -175,9 +185,11 @@ async def cmd_resend_mfa(args: argparse.Namespace) -> int:
     finally:
         await auth.close()
 
-    if args.json:
-        emit_json({"pending_login": str(pending_path), "mfa_sent": True})
-    else:
+    if not emit_machine(
+        {"pending_login": str(pending_path), "mfa_sent": True},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Verification code resent. Pending login: {pending_path}")
     return 0
 
@@ -192,9 +204,11 @@ async def cmd_refresh(args: argparse.Namespace) -> int:
     finally:
         await auth.close()
 
-    if args.json:
-        emit_json({"session": str(session_path), "user_id": auth.user_id})
-    else:
+    if not emit_machine(
+        {"session": str(session_path), "user_id": auth.user_id},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Commerce session refreshed. Session saved to {session_path}")
     return 0
 
@@ -207,9 +221,7 @@ async def cmd_logout(args: argparse.Namespace) -> int:
     finally:
         await client.close()
 
-    if args.json:
-        emit_json({"logged_out": True})
-    else:
+    if not emit_machine({"logged_out": True}, as_json=args.json, raw=args.raw):
         print("Logged out.")
     return 0
 

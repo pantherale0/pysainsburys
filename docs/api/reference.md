@@ -32,6 +32,12 @@
 
 ::: pysainsburys.models.product.product.ProductList
 
+::: pysainsburys.models.product.product.Promotion
+
+::: pysainsburys.models.product.product.NectarPrice
+
+::: pysainsburys.models.product.details.ProductDetails
+
 ::: pysainsburys.models.product.nutrition.NutritionInfo
 
 ::: pysainsburys.models.product.nutrition.parse_nutrition_from_details_html

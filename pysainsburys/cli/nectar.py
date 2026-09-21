@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from .output import (
-    emit_json,
+    emit_machine,
     emit_nectar_offers,
     emit_nectar_search,
     emit_your_nectar_prices,
@@ -19,7 +19,7 @@ async def cmd_offers(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         offers = await customer.nectar.fetch_offers()
-        emit_nectar_offers(offers, as_json=args.json)
+        emit_nectar_offers(offers, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -35,12 +35,10 @@ async def cmd_prices(args: argparse.Namespace) -> int:
             result = await nectar.unlock_your_nectar_prices(
                 offer_id=args.offer_id,
             )
-            if args.json:
-                emit_json(result.to_dict())
-            else:
+            if not emit_machine(result, as_json=args.json, raw=args.raw):
                 print(f"Unlocked {len(result.updated_offer_ids)} offer(s).")
         prices = await nectar.enrich_your_nectar_prices()
-        emit_your_nectar_prices(prices, as_json=args.json)
+        emit_your_nectar_prices(prices, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -52,7 +50,7 @@ async def cmd_search(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         results = await customer.nectar.search(args.query)
-        emit_nectar_search(results, as_json=args.json)
+        emit_nectar_search(results, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0

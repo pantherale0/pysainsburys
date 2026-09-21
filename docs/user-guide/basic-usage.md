@@ -179,12 +179,18 @@ Command groups mirror the library modules:
 python -m pysainsburys --help
 python -m pysainsburys product search bread --page 2
 python -m pysainsburys product show 3236048 --json
+python -m pysainsburys product search bread --raw
 python -m pysainsburys basket add 3236048 --quantity 2
 python -m pysainsburys favourites add 3236048
 python -m pysainsburys slots list --type delivery
 python -m pysainsburys store search 2665 milk
 python -m pysainsburys auth refresh
 ```
+
+``--json`` prints the command result as one JSON object, including list
+metadata such as pagination. ``--raw`` prints the records as a JSON array.
+Each element includes every public attribute of that object, including nested
+models. The two flags cannot be combined.
 
 Session files default to ``~/.config/pysainsburys/session.json``. Override with
 ``--session /path/to/session.json``.

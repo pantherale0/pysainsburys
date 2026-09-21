@@ -4,7 +4,7 @@ Domain models for the Sainsbury's Groceries Online API.
 Models are grouped by business domain:
 
 * :mod:`pysainsburys.models.common` — shared value types and pagination
-* :mod:`pysainsburys.models.product` — catalogue products and nutrition
+* :mod:`pysainsburys.models.product` — products, detail sections, and nutrition
 * :mod:`pysainsburys.models.basket` — basket line items and totals
 * :mod:`pysainsburys.models.customer` — authenticated customer profile
 * :mod:`pysainsburys.models.order` — order history and status
@@ -30,18 +30,23 @@ from .nectar import (
 )
 from .order import OrderList, OrderStatus, OrderSummary
 from .product import (
+    NectarPrice,
     NutrientSummary,
     NutritionInfo,
     NutritionTable,
     NutritionTableRow,
     Product,
+    ProductDetails,
     ProductList,
     ProductReviews,
+    Promotion,
     bind_product,
     bind_products,
     decode_details_html,
     parse_nutrition,
     parse_nutrition_from_details_html,
+    parse_product_details,
+    parse_product_details_from_details_html,
 )
 from .slot import (
     DeliverySlot,
@@ -69,6 +74,7 @@ __all__ = [
     "LocationContext",
     "NectarOffer",
     "NectarOffers",
+    "NectarPrice",
     "NectarSearchHit",
     "NectarSearchResults",
     "NutrientSummary",
@@ -81,8 +87,10 @@ __all__ = [
     "PageControls",
     "Price",
     "Product",
+    "ProductDetails",
     "ProductList",
     "ProductReviews",
+    "Promotion",
     "SlotDay",
     "SlotReservation",
     "SlotWeek",
@@ -101,4 +109,6 @@ __all__ = [
     "decode_details_html",
     "parse_nutrition",
     "parse_nutrition_from_details_html",
+    "parse_product_details",
+    "parse_product_details_from_details_html",
 ]

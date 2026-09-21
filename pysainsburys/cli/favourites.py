@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 
 from ._args import add_pagination_options
-from .output import emit_json, emit_product_list
+from .output import emit_machine, emit_product_list
 from .session import with_client
 
 
@@ -18,7 +18,12 @@ async def cmd_list(args: argparse.Namespace) -> int:
             page_number=args.page,
             page_size=args.page_size,
         )
-        emit_product_list(favourites, as_json=args.json, title="Favourites")
+        emit_product_list(
+            favourites,
+            as_json=args.json,
+            raw=args.raw,
+            title="Favourites",
+        )
     finally:
         await client.close()
     return 0
@@ -33,9 +38,11 @@ async def cmd_add(args: argparse.Namespace) -> int:
     finally:
         await client.close()
 
-    if args.json:
-        emit_json({"product_uid": args.product_uid, "added": True})
-    else:
+    if not emit_machine(
+        {"product_uid": args.product_uid, "added": True},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Added {args.product_uid} to favourites.")
     return 0
 
@@ -49,9 +56,11 @@ async def cmd_remove(args: argparse.Namespace) -> int:
     finally:
         await client.close()
 
-    if args.json:
-        emit_json({"product_uid": args.product_uid, "removed": True})
-    else:
+    if not emit_machine(
+        {"product_uid": args.product_uid, "removed": True},
+        as_json=args.json,
+        raw=args.raw,
+    ):
         print(f"Removed {args.product_uid} from favourites.")
     return 0
 

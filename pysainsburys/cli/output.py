@@ -3,12 +3,55 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
+from dataclasses import fields, is_dataclass
+from enum import Enum
 from typing import Any
 
 
 def emit_json(data: Any) -> None:
     """Print JSON to stdout."""
     print(json.dumps(data, indent=2, sort_keys=True, default=str))
+
+
+def to_jsonable(value: Any) -> Any:
+    """Convert a value to JSON, keeping every public dataclass attribute."""
+    if is_dataclass(value) and not isinstance(value, type):
+        return {
+            item.name: to_jsonable(getattr(value, item.name))
+            for item in fields(value)
+            if not item.name.startswith("_")
+        }
+    if isinstance(value, Enum):
+        return value.value
+    if isinstance(value, dict):
+        return {str(key): to_jsonable(item) for key, item in value.items()}
+    if isinstance(value, list | tuple):
+        return [to_jsonable(item) for item in value]
+    return value
+
+
+def emit_raw(records: Sequence[Any]) -> None:
+    """Print records as a JSON array with every public attribute."""
+    print(json.dumps([to_jsonable(record) for record in records], default=str))
+
+
+def emit_machine(
+    data: Any,
+    *,
+    as_json: bool,
+    raw: bool,
+    records: Sequence[Any] | None = None,
+) -> bool:
+    """Print JSON output when requested and report whether anything was printed."""
+    if raw:
+        emit_raw([data] if records is None else records)
+        return True
+    if as_json:
+        to_dict = getattr(data, "to_dict", None)
+        emit_json(to_dict() if callable(to_dict) else data)
+        return True
+    return False
 
 
 def format_price(value: float | None) -> str:
@@ -18,10 +61,9 @@ def format_price(value: float | None) -> str:
     return f"£{value:.2f}"
 
 
-def emit_customer(customer: Any, *, as_json: bool) -> None:
+def emit_customer(customer: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print customer profile output."""
-    if as_json:
-        emit_json(customer.to_dict())
+    if emit_machine(customer, as_json=as_json, raw=raw):
         return
     print(f"Name:     {customer.display_name}")
     if customer.email:
@@ -33,10 +75,9 @@ def emit_customer(customer: Any, *, as_json: bool) -> None:
         print("Nectar:   linked")
 
 
-def emit_basket(basket: Any, *, as_json: bool) -> None:
+def emit_basket(basket: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print basket output."""
-    if as_json:
-        emit_json(basket.to_dict())
+    if emit_machine(basket, as_json=as_json, raw=raw, records=basket.items):
         return
     print(
         f"Basket ({basket.item_count} items) — "
@@ -54,10 +95,15 @@ def emit_basket(basket: Any, *, as_json: bool) -> None:
         print(f"  {item.quantity:g} x {name}  {line_total}  ({', '.join(refs)})")
 
 
-def emit_product_list(products: Any, *, as_json: bool, title: str) -> None:
+def emit_product_list(
+    products: Any,
+    *,
+    as_json: bool,
+    title: str,
+    raw: bool = False,
+) -> None:
     """Print a paginated product list."""
-    if as_json:
-        emit_json(products.to_dict())
+    if emit_machine(products, as_json=as_json, raw=raw, records=products.products):
         return
     controls = products.controls
     print(f"{title} (page {controls.active_page}/{controls.last_page})")
@@ -69,10 +115,9 @@ def emit_product_list(products: Any, *, as_json: bool, title: str) -> None:
         print(f"  {product.product_uid}  {product.name}{favourite}  {price}")
 
 
-def emit_nectar_offers(offers: Any, *, as_json: bool) -> None:
+def emit_nectar_offers(offers: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print Nectar bonus-point offers."""
-    if as_json:
-        emit_json(offers.to_dict())
+    if emit_machine(offers, as_json=as_json, raw=raw, records=offers.offers):
         return
     status = offers.account_status or "unknown"
     print(f"Nectar offers ({status})")
@@ -89,10 +134,14 @@ def emit_nectar_offers(offers: Any, *, as_json: bool) -> None:
         print(f"    skus: {skus}  expires: {expires}")
 
 
-def emit_your_nectar_prices(prices: Any, *, as_json: bool) -> None:
+def emit_your_nectar_prices(prices: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print Your Nectar Price offers."""
-    if as_json:
-        emit_json(prices.to_dict())
+    if emit_machine(
+        prices,
+        as_json=as_json,
+        raw=raw,
+        records=_your_nectar_price_records(prices),
+    ):
         return
     if prices.available_until:
         print(f"Your Nectar Prices (available until {prices.available_until})")
@@ -122,10 +171,9 @@ def _emit_ynp_line(offer: Any, *, unlocked: bool) -> None:
     print(f"  {offer.sku}  {name}  {price}  [{state}]  expires {expires}")
 
 
-def emit_nectar_search(results: Any, *, as_json: bool) -> None:
+def emit_nectar_search(results: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print Nectar search results."""
-    if as_json:
-        emit_json(results.to_dict())
+    if emit_machine(results, as_json=as_json, raw=raw, records=results.hits):
         return
     print(f"Nectar search: {results.query!r} ({len(results.hits)} results)")
     for hit in results.hits:
@@ -145,10 +193,9 @@ def emit_nectar_search(results: Any, *, as_json: bool) -> None:
             print(f"  [ynp] {hit.sku}  {name}  {price}  [{state}]")
 
 
-def emit_order_list(orders: Any, *, as_json: bool) -> None:
+def emit_order_list(orders: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a paginated order list."""
-    if as_json:
-        emit_json(orders.to_dict())
+    if emit_machine(orders, as_json=as_json, raw=raw, records=orders.orders):
         return
     controls = orders.controls
     print(f"Orders (page {controls.active_page}/{controls.last_page})")
@@ -159,10 +206,9 @@ def emit_order_list(orders: Any, *, as_json: bool) -> None:
         print(f"  {order.order_id}  {status}  {slot}  {total}")
 
 
-def emit_order(order: Any, *, as_json: bool) -> None:
+def emit_order(order: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a single order."""
-    if as_json:
-        emit_json(order.to_dict())
+    if emit_machine(order, as_json=as_json, raw=raw):
         return
     print(f"Order:  {order.order_id}")
     if order.status:
@@ -174,10 +220,9 @@ def emit_order(order: Any, *, as_json: bool) -> None:
         print(f"Slot:   {order.slot_start_time} - {end}")
 
 
-def emit_order_status(status: Any, *, as_json: bool) -> None:
+def emit_order_status(status: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print active order status."""
-    if as_json:
-        emit_json(status.to_dict())
+    if emit_machine(status, as_json=as_json, raw=raw):
         return
     if status.order_uid:
         print(f"Order:      {status.order_uid}")
@@ -189,10 +234,9 @@ def emit_order_status(status: Any, *, as_json: bool) -> None:
         print(f"Slot:       {status.slot_start_time} - {end}")
 
 
-def emit_slot_week(week: Any, *, as_json: bool) -> None:
+def emit_slot_week(week: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a slot week listing."""
-    if as_json:
-        emit_json(week.to_dict())
+    if emit_machine(week, as_json=as_json, raw=raw, records=_slot_records(week)):
         return
     slot_type = week.slot_type.value if week.slot_type else "slot"
     header = f"{slot_type.title()} slots"
@@ -221,10 +265,14 @@ def emit_slot_week(week: Any, *, as_json: bool) -> None:
             print(f"    {start} - {end}  {price}  [{status}]  {uid}")
 
 
-def emit_slot_reservation(reservation: Any, *, as_json: bool) -> None:
+def emit_slot_reservation(
+    reservation: Any,
+    *,
+    as_json: bool,
+    raw: bool = False,
+) -> None:
     """Print the current slot reservation."""
-    if as_json:
-        emit_json(reservation.to_dict())
+    if emit_machine(reservation, as_json=as_json, raw=raw):
         return
     print(f"Type:   {reservation.reservation_type or '-'}")
     if reservation.postcode:
@@ -242,10 +290,9 @@ def emit_slot_reservation(reservation: Any, *, as_json: bool) -> None:
         print("Slot:     none reserved")
 
 
-def emit_location_context(context: Any, *, as_json: bool) -> None:
+def emit_location_context(context: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print the location context used for slot operations."""
-    if as_json:
-        emit_json(context.to_dict())
+    if emit_machine(context, as_json=as_json, raw=raw):
         return
     print(f"Type:         {context.slot_type or '-'}")
     print(f"Postcode:     {context.postcode or '-'}")
@@ -255,21 +302,51 @@ def emit_location_context(context: Any, *, as_json: bool) -> None:
     print(f"Order UID:    {context.order_uid or '-'}")
 
 
-def emit_product(product: Any, *, as_json: bool) -> None:
+def emit_product(product: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a single catalogue product."""
-    if as_json:
-        emit_json(product.to_dict())
+    if emit_machine(product, as_json=as_json, raw=raw):
         return
     print(f"{product.name} ({product.product_uid})")
     if product.eans:
         print(f"EANs:      {', '.join(product.eans)}")
     if product.retail_price:
         print(f"Price:     {format_price(product.retail_price.price)}")
+    if product.nectar_price:
+        print(f"Nectar:    {format_price(product.nectar_price.retail_price)}")
+    for promotion in product.promotions:
+        label = promotion.strap_line or promotion.promotion_uid
+        if promotion.original_price is None:
+            print(f"Offer:     {label}")
+        else:
+            was = format_price(promotion.original_price)
+            print(f"Offer:     {label}  (was {was})")
     print(f"Available: {'yes' if product.is_available else 'no'}")
     if product.is_favourite:
         print("Favourite: yes")
+    if product.details:
+        _emit_product_details(product.details)
     if product.nutrition:
         emit_nutrition(product.nutrition)
+
+
+def _emit_product_details(details: Any) -> None:
+    """Print description, storage, and other product-text sections."""
+    sections = (
+        ("Description", details.description),
+        ("Storage", details.storage),
+        ("Dietary information", details.dietary_information),
+        ("Ingredients", details.ingredients),
+        ("Manufacturer", details.manufacturer),
+        ("Preparation", details.preparation),
+        ("Country of origin", details.country_of_origin),
+        ("Packaging", details.packaging),
+    )
+    for label, paragraphs in sections:
+        if not paragraphs:
+            continue
+        print(f"{label}:")
+        for paragraph in paragraphs:
+            print(f"  {paragraph}")
 
 
 def emit_nutrition(nutrition: Any) -> None:
@@ -299,10 +376,15 @@ def emit_nutrition(nutrition: Any) -> None:
         print(f"  {note}")
 
 
-def emit_store_list(stores: Any, *, as_json: bool, title: str) -> None:
+def emit_store_list(
+    stores: Any,
+    *,
+    as_json: bool,
+    title: str,
+    raw: bool = False,
+) -> None:
     """Print a paginated store list."""
-    if as_json:
-        emit_json(stores.to_dict())
+    if emit_machine(stores, as_json=as_json, raw=raw, records=stores.stores):
         return
     if stores.page is not None:
         print(f"{title} (page {stores.page.number}/{stores.page.total_pages})")
@@ -320,10 +402,9 @@ def emit_store_list(stores: Any, *, as_json: bool, title: str) -> None:
         print(f"    {store.address1}, {store.city} {store.post_code}")
 
 
-def emit_store(store: Any, *, as_json: bool) -> None:
+def emit_store(store: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a single store."""
-    if as_json:
-        emit_json(store.to_dict())
+    if emit_machine(store, as_json=as_json, raw=raw):
         return
     store_ref = store.store_number or store.store_id or "unknown"
     print(f"{store.name} ({store_ref})")
@@ -340,10 +421,9 @@ def emit_store(store: Any, *, as_json: bool) -> None:
     print(f"Click & collect: {'yes' if store.click_and_collect_available else 'no'}")
 
 
-def emit_store_product(product: Any, *, as_json: bool) -> None:
+def emit_store_product(product: Any, *, as_json: bool, raw: bool = False) -> None:
     """Print a single in-store product."""
-    if as_json:
-        emit_json(product.to_dict())
+    if emit_machine(product, as_json=as_json, raw=raw):
         return
     aisle = f"  aisle {product.aisle}" if product.aisle else ""
     print(f"{product.name} ({product.product_code})")
@@ -351,10 +431,41 @@ def emit_store_product(product: Any, *, as_json: bool) -> None:
     print(f"Stock:  {product.stock}{aisle}")
 
 
-def emit_store_product_list(products: Any, *, as_json: bool, title: str) -> None:
+def _your_nectar_price_records(prices: Any) -> list[dict[str, Any]]:
+    """Flatten Your Nectar Price offers and keep opt-in state."""
+    records: list[dict[str, Any]] = []
+    for offer in prices.opted_in:
+        record = to_jsonable(offer)
+        record["opted_in"] = True
+        records.append(record)
+    for offer in prices.not_opted_in:
+        record = to_jsonable(offer)
+        record["opted_in"] = False
+        records.append(record)
+    return records
+
+
+def _slot_records(week: Any) -> list[dict[str, Any]]:
+    """Flatten delivery slots and keep the day they belong to."""
+    records: list[dict[str, Any]] = []
+    for day in week.days:
+        for slot in day.slots:
+            record = to_jsonable(slot)
+            record["date"] = day.date
+            record["day_label"] = day.day_label
+            records.append(record)
+    return records
+
+
+def emit_store_product_list(
+    products: Any,
+    *,
+    as_json: bool,
+    title: str,
+    raw: bool = False,
+) -> None:
     """Print in-store product search results."""
-    if as_json:
-        emit_json(products.to_dict())
+    if emit_machine(products, as_json=as_json, raw=raw, records=products.products):
         return
     page = products.page
     print(f"{title} (page {page.number}/{page.total_pages})")

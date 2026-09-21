@@ -23,7 +23,7 @@ async def cmd_near(args: argparse.Namespace) -> int:
             page=args.page,
             page_size=args.page_size,
         )
-        emit_store_list(stores, as_json=args.json, title="Nearby stores")
+        emit_store_list(stores, as_json=args.json, raw=args.raw, title="Nearby stores")
     finally:
         await client.close()
     return 0
@@ -40,6 +40,7 @@ async def cmd_postcode(args: argparse.Namespace) -> int:
         emit_store_list(
             stores,
             as_json=args.json,
+            raw=args.raw,
             title=f"Stores near {args.postcode}",
         )
     finally:
@@ -52,7 +53,7 @@ async def cmd_show(args: argparse.Namespace) -> int:
     client = await with_public_client()
     try:
         store = await client.get_store(args.store_id)
-        emit_store(store, as_json=args.json)
+        emit_store(store, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -71,6 +72,7 @@ async def cmd_search(args: argparse.Namespace) -> int:
         emit_store_product_list(
             products,
             as_json=args.json,
+            raw=args.raw,
             title=f"Store {args.store_id}: {args.keyword}",
         )
     finally:

@@ -18,7 +18,7 @@ async def cmd_list(args: argparse.Namespace) -> int:
             page_number=args.page,
             page_size=args.page_size,
         )
-        emit_order_list(orders, as_json=args.json)
+        emit_order_list(orders, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -30,7 +30,7 @@ async def cmd_show(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         order = await customer.orders[args.order_id].fetch()
-        emit_order(order, as_json=args.json)
+        emit_order(order, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -46,7 +46,7 @@ async def cmd_status(args: argparse.Namespace) -> int:
         else:
             await customer.orders.fetch(page_number=1, page_size=1)
             status = await customer.orders.latest.status()
-        emit_order_status(status, as_json=args.json)
+        emit_order_status(status, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0

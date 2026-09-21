@@ -49,11 +49,21 @@ the root package for convenience.
 | :class:`~pysainsburys.models.product.product.ProductList` | Paginated search or favourites results |
 | :class:`~pysainsburys.models.product.product.ProductReviews` | Review count and average rating |
 | :class:`~pysainsburys.models.product.nutrition.NutritionInfo` | Parsed nutrition summary, tables, and footnotes |
+| :class:`~pysainsburys.models.product.details.ProductDetails` | Description, storage, and other product-text sections |
+| :class:`~pysainsburys.models.product.product.Promotion` | Catalogue offer attached to a product |
+| :class:`~pysainsburys.models.product.product.NectarPrice` | Nectar member price for a product |
 
-Nutrition is extracted from the ``details_html`` field on product detail
-responses (base64-encoded HTML from the website). Use
+Nutrition, storage, and the other product-text headings are extracted from
+the ``details_html`` field on product detail responses (base64-encoded HTML
+from the website). Search results omit that field, so
+:attr:`~pysainsburys.models.product.product.Product.details` stays empty
+until the product is loaded with ``get_product``. When the HTML has no
+Description section, ``description`` falls back to the JSON ``description``
+list. Catalogue offers and the Nectar member price are copied from the
+``promotions`` and ``nectar_price`` fields on the same product JSON, including
+search results. Use
 :func:`~pysainsburys.models.product.nutrition.parse_nutrition_from_details_html`
-to parse raw API payloads directly.
+to parse nutrition from a raw payload directly.
 
 ## Basket
 

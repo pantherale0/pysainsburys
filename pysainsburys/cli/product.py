@@ -14,7 +14,7 @@ async def cmd_show(args: argparse.Namespace) -> int:
     client = await with_public_client()
     try:
         product = await client.get_product(args.product_uid)
-        emit_product(product, as_json=args.json)
+        emit_product(product, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -32,6 +32,7 @@ async def cmd_search(args: argparse.Namespace) -> int:
         emit_product_list(
             products,
             as_json=args.json,
+            raw=args.raw,
             title=f"Search: {args.keyword}",
         )
     finally:

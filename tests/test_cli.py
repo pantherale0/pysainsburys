@@ -2,8 +2,17 @@
 
 from __future__ import annotations
 
-from pysainsburys.cli import build_parser, default_session_path
+import json
+
+import pytest
+
+from pysainsburys.cli import build_parser, default_session_path, parse_args
+from pysainsburys.cli.output import emit_product, emit_product_list, emit_slot_week
 from pysainsburys.enum import SlotType
+from pysainsburys.models.common.pagination import PageControls
+from pysainsburys.models.common.price import Price
+from pysainsburys.models.product.product import Product, ProductList, ProductReviews
+from pysainsburys.models.slot.slot import DeliverySlot, SlotDay, SlotWeek
 
 
 def test_default_session_path() -> None:
@@ -183,3 +192,128 @@ def test_parser_slots_validate_and_context_commands() -> None:
     assert validate.slots_command == "validate"
     assert validate.order_uid == "order-123"
     assert context.slots_command == "context"
+
+
+def test_parser_raw_option() -> None:
+    """The raw flag selects JSON-array output and excludes --json."""
+    args = parse_args(["product", "show", "abc-123", "--raw"])
+    assert args.raw is True
+    assert args.json is False
+    with pytest.raises(SystemExit):
+        parse_args(["--json", "--raw", "product", "show", "abc-123"])
+
+
+def test_emit_product_raw_preserves_attributes(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Raw product output is a one-element array of every public attribute."""
+    product = Product(
+        product_uid="123",
+        name="Milk",
+        is_alcoholic=True,
+        image_url="https://example.test/milk.jpg",
+        retail_price=Price(price=1.25, measure="ea", measure_amount=1),
+        reviews=ProductReviews(
+            is_enabled=True,
+            product_uid="123",
+            total=4,
+            average_rating=4.5,
+        ),
+    )
+    emit_product(product, as_json=False, raw=True)
+    payload = json.loads(capsys.readouterr().out)
+    assert payload == [
+        {
+            "product_uid": "123",
+            "name": "Milk",
+            "sain_id": None,
+            "is_favourite": False,
+            "favourite_type": None,
+            "product_type": None,
+            "eans": [],
+            "unit_price": None,
+            "retail_price": {
+                "price": 1.25,
+                "measure": "ea",
+                "measure_amount": 1,
+            },
+            "is_available": True,
+            "is_alcoholic": True,
+            "reviews": {
+                "is_enabled": True,
+                "product_uid": "123",
+                "total": 4,
+                "average_rating": 4.5,
+            },
+            "image_url": "https://example.test/milk.jpg",
+            "nutrition": None,
+            "details": None,
+        }
+    ]
+    assert "_api" not in payload[0]
+
+
+def test_emit_product_list_raw_is_an_array(capsys: pytest.CaptureFixture[str]) -> None:
+    """Raw list output is the product records, without pagination metadata."""
+    products = ProductList(
+        products=[
+            Product(product_uid="1", name="Bread"),
+            Product(product_uid="2", name="Milk"),
+        ],
+        controls=PageControls(
+            total_record_count=2,
+            returned_record_count=2,
+            active_page=1,
+            first_page=1,
+            last_page=1,
+            page_size=20,
+        ),
+    )
+    emit_product_list(products, as_json=False, raw=True, title="Search")
+    payload = json.loads(capsys.readouterr().out)
+    assert [item["product_uid"] for item in payload] == ["1", "2"]
+    assert "controls" not in payload[0]
+    assert payload[0]["eans"] == []
+
+
+def test_emit_slot_week_raw_keeps_slot_and_day_attributes(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Raw slot output is an array of slots with the day they belong to."""
+    week = SlotWeek(
+        slot_type=SlotType.DELIVERY,
+        days=[
+            SlotDay(
+                date="2026-09-21",
+                day_label="Monday",
+                slots=[
+                    DeliverySlot(
+                        slot_uid="slot-1",
+                        start_time="09:00",
+                        end_time="10:00",
+                        price=0.5,
+                        unqualified_price=1.0,
+                        is_available=True,
+                        status="AVAILABLE",
+                        slot_type="delivery",
+                    )
+                ],
+            )
+        ],
+    )
+    emit_slot_week(week, as_json=False, raw=True)
+    payload = json.loads(capsys.readouterr().out)
+    assert payload == [
+        {
+            "slot_uid": "slot-1",
+            "start_time": "09:00",
+            "end_time": "10:00",
+            "price": 0.5,
+            "unqualified_price": 1.0,
+            "is_available": True,
+            "status": "AVAILABLE",
+            "slot_type": "delivery",
+            "date": "2026-09-21",
+            "day_label": "Monday",
+        }
+    ]

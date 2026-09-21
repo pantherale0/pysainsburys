@@ -10,6 +10,7 @@ from ...exceptions import NotBoundError
 from ..basket.basket import Basket, basket_from_response
 from ..common.pagination import PageControls
 from ..common.price import Price
+from .details import ProductDetails, product_details_from_api
 from .nutrition import NutritionInfo, parse_nutrition_from_details_html
 
 if TYPE_CHECKING:
@@ -57,6 +58,141 @@ class ProductReviews:
 
 
 @dataclass(slots=True)
+class Promotion:
+    """
+    A catalogue promotion attached to a product.
+
+    Attributes:
+        promotion_uid: Promotion identifier.
+        strap_line: Customer-facing offer text, such as ``Buy 1 for 3``.
+        start_date: Offer start timestamp from the API.
+        end_date: Offer end timestamp from the API.
+        original_price: Shelf price before the promotion, in pounds sterling.
+        is_nectar: Whether the offer is a Nectar price.
+        promo_type: Promotion mechanic type from the API.
+        promo_group: Promotion grouping from the API.
+        promo_mechanic_id: Mechanic identifier from the API.
+        icon: Promotion icon URL when provided.
+        link: Relative link to the promotion lister.
+
+    """
+
+    promotion_uid: str
+    strap_line: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    original_price: float | None = None
+    is_nectar: bool = False
+    promo_type: str | None = None
+    promo_group: str | None = None
+    promo_mechanic_id: str | None = None
+    icon: str | None = None
+    link: str | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> Promotion | None:
+        """Parse a promotion from grocery API JSON."""
+        if not data:
+            return None
+        promotion_uid = data.get("promotion_uid")
+        if not promotion_uid and not data.get("strap_line"):
+            return None
+        original_price = data.get("original_price")
+        mechanic_id = data.get("promo_mechanic_id")
+        return cls(
+            promotion_uid=str(promotion_uid or ""),
+            strap_line=data.get("strap_line"),
+            start_date=data.get("start_date"),
+            end_date=data.get("end_date"),
+            original_price=(
+                float(original_price) if original_price is not None else None
+            ),
+            is_nectar=bool(data.get("is_nectar", False)),
+            promo_type=data.get("promo_type"),
+            promo_group=data.get("promo_group"),
+            promo_mechanic_id=str(mechanic_id) if mechanic_id is not None else None,
+            icon=data.get("icon") or None,
+            link=data.get("link"),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialise the promotion to a plain dictionary."""
+        return {
+            "promotion_uid": self.promotion_uid,
+            "strap_line": self.strap_line,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "original_price": self.original_price,
+            "is_nectar": self.is_nectar,
+            "promo_type": self.promo_type,
+            "promo_group": self.promo_group,
+            "promo_mechanic_id": self.promo_mechanic_id,
+            "icon": self.icon,
+            "link": self.link,
+        }
+
+
+@dataclass(slots=True)
+class NectarPrice:
+    """
+    Nectar member price for a product.
+
+    Attributes:
+        retail_price: Nectar price for the purchasable quantity.
+        unit_price: Nectar price per unit of measure, when provided.
+        measure: Unit label for ``unit_price``.
+        url: Link to the Nectar prices listing.
+        category_seo_url: SEO path for the Nectar prices category.
+
+    """
+
+    retail_price: float
+    unit_price: float | None = None
+    measure: str | None = None
+    url: str | None = None
+    category_seo_url: str | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> NectarPrice | None:
+        """Parse a Nectar price from grocery API JSON."""
+        if not data or data.get("retail_price") is None:
+            return None
+        unit_price = data.get("unit_price")
+        return cls(
+            retail_price=float(data["retail_price"]),
+            unit_price=float(unit_price) if unit_price is not None else None,
+            measure=data.get("measure"),
+            url=data.get("url"),
+            category_seo_url=data.get("category_seo_url"),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialise the Nectar price to a plain dictionary."""
+        return {
+            "retail_price": self.retail_price,
+            "unit_price": self.unit_price,
+            "measure": self.measure,
+            "url": self.url,
+            "category_seo_url": self.category_seo_url,
+        }
+
+
+def _promotions_from_api(data: dict[str, Any]) -> list[Promotion]:
+    """Parse the ``promotions`` array from a product payload."""
+    raw = data.get("promotions")
+    if not isinstance(raw, list):
+        return []
+    promotions: list[Promotion] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        promotion = Promotion.from_dict(item)
+        if promotion is not None:
+            promotions.append(promotion)
+    return promotions
+
+
+@dataclass(slots=True)
 class Product:
     """
     A grocery product from the online catalogue.
@@ -67,7 +203,10 @@ class Product:
     :meth:`remove_from_basket`.
 
     Nutrition data is parsed automatically from ``details_html`` when present
-    on the API response (see :attr:`nutrition`).
+    on the API response (see :attr:`nutrition`). The same HTML also supplies
+    description, storage, and related copy on :attr:`details`. Search results
+    omit ``details_html``, so those sections stay empty until the product is
+    loaded with :meth:`~pysainsburys.Sainsburys.get_product`.
 
     Attributes:
         product_uid: Stable Sainsbury's product identifier.
@@ -85,6 +224,9 @@ class Product:
         reviews: Aggregated review metadata.
         image_url: Product listing image URL.
         nutrition: Parsed nutrition tables and traffic-light summary.
+        details: Description, storage, and other product-text sections.
+        promotions: Catalogue offers attached to the product.
+        nectar_price: Nectar member price when the product has one.
 
     """
 
@@ -102,6 +244,9 @@ class Product:
     reviews: ProductReviews | None = None
     image_url: str | None = None
     nutrition: NutritionInfo | None = None
+    details: ProductDetails | None = None
+    promotions: list[Promotion] = field(default_factory=list)
+    nectar_price: NectarPrice | None = None
     _api: API | None = field(default=None, repr=False, compare=False, hash=False)
 
     @classmethod
@@ -109,6 +254,8 @@ class Product:
         """Parse a product from grocery API JSON."""
         assets = data.get("assets") or {}
         details_html = data.get("details_html")
+        if not isinstance(details_html, str):
+            details_html = None
         return cls(
             product_uid=str(data.get("product_uid") or data.get("uid") or ""),
             name=str(data.get("name", "")),
@@ -124,6 +271,13 @@ class Product:
             reviews=ProductReviews.from_dict(data.get("reviews")),
             image_url=assets.get("plp_image"),
             nutrition=parse_nutrition_from_details_html(details_html),
+            details=product_details_from_api(details_html, data.get("description")),
+            promotions=_promotions_from_api(data),
+            nectar_price=NectarPrice.from_dict(
+                data["nectar_price"]
+                if isinstance(data.get("nectar_price"), dict)
+                else None
+            ),
             _api=api,
         )
 
@@ -258,6 +412,11 @@ class Product:
             "reviews": self.reviews.to_dict() if self.reviews else None,
             "image_url": self.image_url,
             "nutrition": self.nutrition.to_dict() if self.nutrition else None,
+            "details": self.details.to_dict() if self.details else None,
+            "promotions": [promotion.to_dict() for promotion in self.promotions],
+            "nectar_price": (
+                self.nectar_price.to_dict() if self.nectar_price else None
+            ),
         }
 
     def __iter__(self) -> Iterator[tuple[str, Any]]:

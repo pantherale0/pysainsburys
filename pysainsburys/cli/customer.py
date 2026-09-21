@@ -13,7 +13,7 @@ async def cmd_show(args: argparse.Namespace) -> int:
     client = await with_client(args)
     try:
         customer = await client.get_customer()
-        emit_customer(customer, as_json=args.json)
+        emit_customer(customer, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0

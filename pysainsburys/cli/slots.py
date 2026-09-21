@@ -30,7 +30,7 @@ async def cmd_list(args: argparse.Namespace) -> int:
                 week_start_date=args.week_start,
                 use_location_context=not args.no_context,
             )
-        emit_slot_week(week, as_json=args.json)
+        emit_slot_week(week, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -44,7 +44,7 @@ async def cmd_reservation(args: argparse.Namespace) -> int:
         reservation = await customer.slots.fetch_reservation(
             order_uid=args.order_uid,
         )
-        emit_slot_reservation(reservation, as_json=args.json)
+        emit_slot_reservation(reservation, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -66,7 +66,7 @@ async def cmd_reserve(args: argparse.Namespace) -> int:
             order_uid=args.order_uid,
             use_location_context=not args.no_context,
         )
-        emit_slot_reservation(reservation, as_json=args.json)
+        emit_slot_reservation(reservation, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -78,7 +78,7 @@ async def cmd_validate(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         reservation = await customer.slots.validate(order_uid=args.order_uid)
-        emit_slot_reservation(reservation, as_json=args.json)
+        emit_slot_reservation(reservation, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -90,7 +90,7 @@ async def cmd_context(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         context = await customer.slots.fetch_location_context()
-        emit_location_context(context, as_json=args.json)
+        emit_location_context(context, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0

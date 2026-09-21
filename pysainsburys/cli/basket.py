@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 
-from .output import emit_basket, emit_json
+from .output import emit_basket, emit_machine
 from .session import with_client
 
 
@@ -14,7 +14,7 @@ async def cmd_show(args: argparse.Namespace) -> int:
     try:
         customer = await client.get_customer()
         basket = await customer.basket.fetch()
-        emit_basket(basket, as_json=args.json)
+        emit_basket(basket, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -31,7 +31,7 @@ async def cmd_add(args: argparse.Namespace) -> int:
             uom=args.uom,
             selected_catchweight=args.catchweight,
         )
-        emit_basket(basket, as_json=args.json)
+        emit_basket(basket, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -49,7 +49,7 @@ async def cmd_set(args: argparse.Namespace) -> int:
             uom=args.uom,
             selected_catchweight=args.catchweight,
         )
-        emit_basket(basket, as_json=args.json)
+        emit_basket(basket, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -65,7 +65,7 @@ async def cmd_remove(args: argparse.Namespace) -> int:
             item_uid=args.item_uid,
             force_delete=args.force,
         )
-        emit_basket(basket, as_json=args.json)
+        emit_basket(basket, as_json=args.json, raw=args.raw)
     finally:
         await client.close()
     return 0
@@ -80,9 +80,7 @@ async def cmd_clear(args: argparse.Namespace) -> int:
     finally:
         await client.close()
 
-    if args.json:
-        emit_json({"cleared": True})
-    else:
+    if not emit_machine({"cleared": True}, as_json=args.json, raw=args.raw):
         print("Basket cleared.")
     return 0
 
