@@ -222,34 +222,12 @@ def test_emit_product_raw_preserves_attributes(
     )
     emit_product(product, as_json=False, raw=True)
     payload = json.loads(capsys.readouterr().out)
-    assert payload == [
-        {
-            "product_uid": "123",
-            "name": "Milk",
-            "sain_id": None,
-            "is_favourite": False,
-            "favourite_type": None,
-            "product_type": None,
-            "eans": [],
-            "unit_price": None,
-            "retail_price": {
-                "price": 1.25,
-                "measure": "ea",
-                "measure_amount": 1,
-            },
-            "is_available": True,
-            "is_alcoholic": True,
-            "reviews": {
-                "is_enabled": True,
-                "product_uid": "123",
-                "total": 4,
-                "average_rating": 4.5,
-            },
-            "image_url": "https://example.test/milk.jpg",
-            "nutrition": None,
-            "details": None,
-        }
-    ]
+    expected = product.to_dict()
+    expected.pop("brand")
+    assert payload == [expected]
+    assert payload[0]["is_alcoholic"] is True
+    assert payload[0]["retail_price"]["price"] == 1.25
+    assert payload[0]["promotions"] == []
     assert "_api" not in payload[0]
 
 
