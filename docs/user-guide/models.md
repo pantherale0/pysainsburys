@@ -52,6 +52,9 @@ the root package for convenience.
 | :class:`~pysainsburys.models.product.details.ProductDetails` | Description, storage, and other product-text sections |
 | :class:`~pysainsburys.models.product.product.Promotion` | Catalogue offer attached to a product |
 | :class:`~pysainsburys.models.product.product.NectarPrice` | Nectar member price for a product |
+| :class:`~pysainsburys.models.product.catalogue.ProductLabel` | Merchandising label such as British or Chilled |
+| :class:`~pysainsburys.models.product.catalogue.ProductCategory` | Catalogue category membership |
+| :class:`~pysainsburys.models.product.catalogue.ProductImage` | Sized product image |
 
 Nutrition, storage, and the other product-text headings are extracted from
 the ``details_html`` field on product detail responses (base64-encoded HTML
@@ -61,7 +64,10 @@ until the product is loaded with ``get_product``. When the HTML has no
 Description section, ``description`` falls back to the JSON ``description``
 list. Catalogue offers and the Nectar member price are copied from the
 ``promotions`` and ``nectar_price`` fields on the same product JSON, including
-search results. Use
+search results. The same payload also supplies brand, labels, categories,
+breadcrumbs, images, the pre-offer unit price, health rating, and loose-item
+average weight. ``important_information`` is the same legal disclaimer on
+every product and is not stored. Use
 :func:`~pysainsburys.models.product.nutrition.parse_nutrition_from_details_html`
 to parse nutrition from a raw payload directly.
 

@@ -307,6 +307,18 @@ def emit_product(product: Any, *, as_json: bool, raw: bool = False) -> None:
     if emit_machine(product, as_json=as_json, raw=raw):
         return
     print(f"{product.name} ({product.product_uid})")
+    if product.brand:
+        print(f"Brand:     {', '.join(product.brand)}")
+    if product.zone:
+        print(f"Zone:      {product.zone}")
+    if product.short_description:
+        print(f"Summary:   {product.short_description}")
+    if product.labels:
+        names = ", ".join(label.text or label.label_uid for label in product.labels)
+        print(f"Labels:    {names}")
+    if product.average_weight:
+        measure = product.average_weight.measure or ""
+        print(f"Weight:    {product.average_weight.amount:g} {measure}".rstrip())
     if product.eans:
         print(f"EANs:      {', '.join(product.eans)}")
     if product.retail_price:

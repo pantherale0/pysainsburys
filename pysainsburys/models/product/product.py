@@ -10,6 +10,26 @@ from ...exceptions import NotBoundError
 from ..basket.basket import Basket, basket_from_response
 from ..common.pagination import PageControls
 from ..common.price import Price
+from .catalogue import (
+    AverageWeight,
+    HfssRestriction,
+    ProductBreadcrumb,
+    ProductCategory,
+    ProductHeader,
+    ProductImage,
+    ProductLabel,
+    ProductPromise,
+    attributes_from_api,
+    breadcrumbs_from_api,
+    categories_from_api,
+    health_rating_from_api,
+    hfss_from_api,
+    images_from_api,
+    labels_from_api,
+    page_url,
+    string_list,
+    text,
+)
 from .details import ProductDetails, product_details_from_api
 from .nutrition import NutritionInfo, parse_nutrition_from_details_html
 
@@ -227,6 +247,35 @@ class Product:
         details: Description, storage, and other product-text sections.
         promotions: Catalogue offers attached to the product.
         nectar_price: Nectar member price when the product has one.
+        favourite_uid: Favourite-list identifier when the product is saved.
+        short_description: One-line summary from the product payload.
+        full_url: Absolute product page URL.
+        original_unit_price: Unit price before a promotion, when the API
+            returns one.
+        image: Large product image URL.
+        image_thumbnail: Medium product image URL.
+        image_thumbnail_small: Small product image URL.
+        image_zoom: Zoom image URL when provided.
+        images: Sized image variants from the assets block.
+        zone: Merchandising zone, such as ``Drinks``.
+        department: Department name when the API returns one.
+        labels: Merchandising labels such as British or Chilled.
+        categories: Catalogue categories that include the product.
+        breadcrumbs: Breadcrumb trail for the product page.
+        attributes: Attribute groups from the API, including brand.
+        header: Promotional header, such as a Nectar price banner.
+        is_spotlight: Whether the product is flagged as featured.
+        spotlight_label: Featured label when ``is_spotlight`` is set.
+        not_for_eu: Whether the product is marked not for EU sale.
+        is_intolerant: Whether the product carries an intolerance flag.
+        is_mhra: Whether MHRA restrictions apply.
+        is_supply_chain_orderable: Whether supply-chain ordering is enabled.
+        display_icons: Icon identifiers shown on the product.
+        health_rating: Health rating score from ``health_classification``.
+        hfss_restrictions: HFSS advertising restrictions by UK nation.
+        pdp_deep_link: Legacy product-display path.
+        average_weight: Typical weight for a loose product.
+        promise: Delivery promise when a slot context is present.
 
     """
 
@@ -247,15 +296,49 @@ class Product:
     details: ProductDetails | None = None
     promotions: list[Promotion] = field(default_factory=list)
     nectar_price: NectarPrice | None = None
+    favourite_uid: str | None = None
+    short_description: str | None = None
+    full_url: str | None = None
+    original_unit_price: Price | None = None
+    image: str | None = None
+    image_thumbnail: str | None = None
+    image_thumbnail_small: str | None = None
+    image_zoom: str | None = None
+    images: list[ProductImage] = field(default_factory=list)
+    zone: str | None = None
+    department: str | None = None
+    labels: list[ProductLabel] = field(default_factory=list)
+    categories: list[ProductCategory] = field(default_factory=list)
+    breadcrumbs: list[ProductBreadcrumb] = field(default_factory=list)
+    attributes: dict[str, list[str]] = field(default_factory=dict)
+    header: ProductHeader | None = None
+    is_spotlight: bool = False
+    spotlight_label: str | None = None
+    not_for_eu: bool = False
+    is_intolerant: bool = False
+    is_mhra: bool = False
+    is_supply_chain_orderable: bool = False
+    display_icons: list[str] = field(default_factory=list)
+    health_rating: str | None = None
+    hfss_restrictions: list[HfssRestriction] = field(default_factory=list)
+    pdp_deep_link: str | None = None
+    average_weight: AverageWeight | None = None
+    promise: ProductPromise | None = None
     _api: API | None = field(default=None, repr=False, compare=False, hash=False)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any], *, api: API | None = None) -> Product:
         """Parse a product from grocery API JSON."""
-        assets = data.get("assets") or {}
+        assets_raw = data.get("assets")
+        assets: dict[str, Any] = assets_raw if isinstance(assets_raw, dict) else {}
         details_html = data.get("details_html")
         if not isinstance(details_html, str):
             details_html = None
+        header_raw = data.get("header")
+        header = header_raw if isinstance(header_raw, dict) else None
+        weight = data.get("average_weight")
+        promise_raw = data.get("promise")
+        promise = promise_raw if isinstance(promise_raw, dict) else None
         return cls(
             product_uid=str(data.get("product_uid") or data.get("uid") or ""),
             name=str(data.get("name", "")),
@@ -269,7 +352,7 @@ class Product:
             is_available=bool(data.get("is_available", True)),
             is_alcoholic=bool(data.get("is_alcoholic", False)),
             reviews=ProductReviews.from_dict(data.get("reviews")),
-            image_url=assets.get("plp_image"),
+            image_url=text(assets.get("plp_image")),
             nutrition=parse_nutrition_from_details_html(details_html),
             details=product_details_from_api(details_html, data.get("description")),
             promotions=_promotions_from_api(data),
@@ -278,8 +361,49 @@ class Product:
                 if isinstance(data.get("nectar_price"), dict)
                 else None
             ),
+            favourite_uid=text(data.get("favourite_uid")),
+            short_description=text(data.get("short_description")),
+            full_url=page_url(data.get("full_url")),
+            original_unit_price=Price.from_dict(
+                data["original_unit_price"]
+                if isinstance(data.get("original_unit_price"), dict)
+                else None
+            ),
+            image=text(data.get("image")),
+            image_thumbnail=text(data.get("image_thumbnail")),
+            image_thumbnail_small=text(data.get("image_thumbnail_small")),
+            image_zoom=text(data.get("image_zoom")),
+            images=images_from_api(assets),
+            zone=text(data.get("zone")),
+            department=text(data.get("department")),
+            labels=labels_from_api(data),
+            categories=categories_from_api(data),
+            breadcrumbs=breadcrumbs_from_api(data),
+            attributes=attributes_from_api(data),
+            header=ProductHeader.from_dict(header),
+            is_spotlight=bool(data.get("is_spotlight", False)),
+            spotlight_label=text(data.get("spotlight_label")),
+            not_for_eu=bool(data.get("not_for_eu", False)),
+            is_intolerant=bool(data.get("is_intolerant", False)),
+            is_mhra=bool(data.get("is_mhra", False)),
+            is_supply_chain_orderable=bool(
+                data.get("is_supply_chain_orderable", False)
+            ),
+            display_icons=string_list(data.get("display_icons")),
+            health_rating=health_rating_from_api(data),
+            hfss_restrictions=hfss_from_api(data),
+            pdp_deep_link=text(data.get("pdp_deep_link")),
+            average_weight=AverageWeight.from_dict(
+                weight if isinstance(weight, dict) else None
+            ),
+            promise=ProductPromise.from_dict(promise),
             _api=api,
         )
+
+    @property
+    def brand(self) -> list[str]:
+        """Brand names from the product attributes."""
+        return list(self.attributes.get("brand", []))
 
     @classmethod
     def from_basket_nested(
@@ -417,6 +541,41 @@ class Product:
             "nectar_price": (
                 self.nectar_price.to_dict() if self.nectar_price else None
             ),
+            "favourite_uid": self.favourite_uid,
+            "short_description": self.short_description,
+            "full_url": self.full_url,
+            "original_unit_price": (
+                self.original_unit_price.to_dict() if self.original_unit_price else None
+            ),
+            "image": self.image,
+            "image_thumbnail": self.image_thumbnail,
+            "image_thumbnail_small": self.image_thumbnail_small,
+            "image_zoom": self.image_zoom,
+            "images": [image.to_dict() for image in self.images],
+            "zone": self.zone,
+            "department": self.department,
+            "labels": [label.to_dict() for label in self.labels],
+            "categories": [category.to_dict() for category in self.categories],
+            "breadcrumbs": [crumb.to_dict() for crumb in self.breadcrumbs],
+            "attributes": self.attributes,
+            "brand": self.brand,
+            "header": self.header.to_dict() if self.header else None,
+            "is_spotlight": self.is_spotlight,
+            "spotlight_label": self.spotlight_label,
+            "not_for_eu": self.not_for_eu,
+            "is_intolerant": self.is_intolerant,
+            "is_mhra": self.is_mhra,
+            "is_supply_chain_orderable": self.is_supply_chain_orderable,
+            "display_icons": self.display_icons,
+            "health_rating": self.health_rating,
+            "hfss_restrictions": [
+                restriction.to_dict() for restriction in self.hfss_restrictions
+            ],
+            "pdp_deep_link": self.pdp_deep_link,
+            "average_weight": (
+                self.average_weight.to_dict() if self.average_weight else None
+            ),
+            "promise": self.promise.to_dict() if self.promise else None,
         }
 
     def __iter__(self) -> Iterator[tuple[str, Any]]:
