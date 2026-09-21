@@ -1079,12 +1079,46 @@ the root package for convenience.</p>
 <td>:class:<code>~pysainsburys.models.product.nutrition.NutritionInfo</code></td>
 <td>Parsed nutrition summary, tables, and footnotes</td>
 </tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.details.ProductDetails</code></td>
+<td>Description, storage, and other product-text sections</td>
+</tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.product.Promotion</code></td>
+<td>Catalogue offer attached to a product</td>
+</tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.product.NectarPrice</code></td>
+<td>Nectar member price for a product</td>
+</tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.catalogue.ProductLabel</code></td>
+<td>Merchandising label such as British or Chilled</td>
+</tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.catalogue.ProductCategory</code></td>
+<td>Catalogue category membership</td>
+</tr>
+<tr>
+<td>:class:<code>~pysainsburys.models.product.catalogue.ProductImage</code></td>
+<td>Sized product image</td>
+</tr>
 </tbody>
 </table>
-<p>Nutrition is extracted from the <code>details_html</code> field on product detail
-responses (base64-encoded HTML from the website). Use
+<p>Nutrition, storage, and the other product-text headings are extracted from
+the <code>details_html</code> field on product detail responses (base64-encoded HTML
+from the website). Search results omit that field, so
+:attr:<code>~pysainsburys.models.product.product.Product.details</code> stays empty
+until the product is loaded with <code>get_product</code>. When the HTML has no
+Description section, <code>description</code> falls back to the JSON <code>description</code>
+list. Catalogue offers and the Nectar member price are copied from the
+<code>promotions</code> and <code>nectar_price</code> fields on the same product JSON, including
+search results. The same payload also supplies brand, labels, categories,
+breadcrumbs, images, the pre-offer unit price, health rating, and loose-item
+average weight. <code>important_information</code> is the same legal disclaimer on
+every product and is not stored. Use
 :func:<code>~pysainsburys.models.product.nutrition.parse_nutrition_from_details_html</code>
-to parse raw API payloads directly.</p>
+to parse nutrition from a raw payload directly.</p>
 <h2 id="basket">Basket<a class="headerlink" href="#basket" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
