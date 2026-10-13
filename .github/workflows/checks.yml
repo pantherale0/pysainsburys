@@ -21,7 +21,7 @@ jobs:
         with:
           ref: ${{ github.head_ref || github.ref }}
 
-      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
 
       - uses: j178/prek-action@v3.0.0
         id: prek
